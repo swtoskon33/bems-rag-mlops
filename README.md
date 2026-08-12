@@ -1,5 +1,10 @@
 # bems-rag-mlops
 
+[![CI](https://github.com/swtoskon33/bems-rag-mlops/actions/workflows/ci.yml/badge.svg)](https://github.com/swtoskon33/bems-rag-mlops/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/python-3.11-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+
 Production-style RAG for building energy management: operators ask natural-language
 questions about their buildings and get grounded answers over real building metadata.
 Built as a reference for how a RAG system is evaluated, tracked, and operated.
