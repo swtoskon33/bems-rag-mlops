@@ -1,12 +1,13 @@
 """Integration tests: the full retrieve -> generate -> answer path, including the
 multi-tenant isolation guarantee and real-data ingestion.
 """
+from pathlib import Path
+
 import pytest
 
 from bems_rag.ingest.bdg2 import load_bdg2_chunks
 from bems_rag.pipeline import RagPipeline
 from bems_rag.types import Chunk, Query, SourceKind
-from pathlib import Path
 
 pytestmark = pytest.mark.integration
 
