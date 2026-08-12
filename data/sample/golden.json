@@ -1,0 +1,16 @@
+{
+  "chunks": [
+    {"id": "b1_solar", "text": "solar produced 320 kWh at noon on clear days", "kind": "telemetry", "building_id": "b1"},
+    {"id": "b1_chiller", "text": "the chiller requires monthly maintenance in summer", "kind": "document", "building_id": "b1"},
+    {"id": "b1_hvac", "text": "HVAC setpoint is 22 degrees during occupied hours", "kind": "document", "building_id": "b1"},
+    {"id": "b2_wind", "text": "wind turbine output was 45 kWh overnight", "kind": "telemetry", "building_id": "b2"},
+    {"id": "b2_ev", "text": "EV chargers drew 60 kWh during the evening peak", "kind": "telemetry", "building_id": "b2"}
+  ],
+  "queries": [
+    {"text": "how much solar did we produce?", "building_id": "b1", "relevant_ids": ["b1_solar"]},
+    {"text": "when does the chiller need maintenance?", "building_id": "b1", "relevant_ids": ["b1_chiller"]},
+    {"text": "what is the HVAC setpoint?", "building_id": "b1", "relevant_ids": ["b1_hvac"]},
+    {"text": "what was the wind output?", "building_id": "b2", "relevant_ids": ["b2_wind"]},
+    {"text": "how much did EV charging use?", "building_id": "b2", "relevant_ids": ["b2_ev"]}
+  ]
+}

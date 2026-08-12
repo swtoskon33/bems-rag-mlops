@@ -1,7 +1,13 @@
 """FAISS-backed retriever with per-building (multi-tenant) isolation.
 
-Each query is scoped to a building_id; the retriever only returns chunks from that
-building, so one tenant can never retrieve another tenant's telemetry or documents.
+Retrieval is tenant-first: we restrict to a building's own chunks BEFORE ranking, so a
+tenant always searches its full sub-corpus regardless of how the global index ranks
+things. This avoids a tenant's chunks being crowded out of a global top-k by other
+tenants (which starves retrieval when embeddings are noisy).
+
+Implementation: one small FAISS index per building, built lazily. Correct and simple
+for modest per-tenant corpora; a production system might use a single index with
+metadata-filtered search (e.g. IVF with tenant partitions).
 """
 from __future__ import annotations
 
@@ -17,42 +23,46 @@ def _as_faiss(v: np.ndarray) -> np.ndarray:
     return np.ascontiguousarray(v, dtype=np.float32)
 
 
-class Retriever:
-    def __init__(self, embedder: Embedder | None = None) -> None:
-        self.embedder = embedder or get_embedder()
-        self._index: faiss.Index | None = None
-        self._chunks: list[Chunk] = []
+class _TenantIndex:
+    """A FAISS index over a single building's chunks."""
 
-    def index(self, chunks: list[Chunk]) -> None:
-        """Build the vector index from a list of chunks."""
-        if not chunks:
-            raise ValueError("cannot index an empty chunk list")
-        self._chunks = list(chunks)
-        vectors = _as_faiss(self.embedder.embed([c.text for c in self._chunks]))
-        # Inner product on L2-normalised vectors == cosine similarity.
-        index = faiss.IndexFlatIP(self.embedder.dim)
-        index.add(vectors)
-        self._index = index
+    def __init__(self, chunks: list[Chunk], embedder: Embedder) -> None:
+        self.chunks = chunks
+        vectors = _as_faiss(embedder.embed([c.text for c in chunks]))
+        self.index = faiss.IndexFlatIP(embedder.dim)
+        self.index.add(vectors)
 
-    def retrieve(self, query: Query, k: int = 4) -> list[RetrievedChunk]:
-        """Return the top-k chunks for a query, restricted to its building."""
-        if self._index is None:
-            raise RuntimeError("index() must be called before retrieve()")
-
-        qv = _as_faiss(self.embedder.embed([query.text]))
-        # Over-fetch, then filter by building, then take k. Simple and correct for
-        # modest corpora; a production index would use per-tenant partitions.
-        n = min(len(self._chunks), max(k * 5, k))
-        scores, idxs = self._index.search(qv, n)
-
-        results: list[RetrievedChunk] = []
+    def search(self, qv: np.ndarray, k: int) -> list[RetrievedChunk]:
+        n = min(len(self.chunks), k)
+        scores, idxs = self.index.search(qv, n)
+        out: list[RetrievedChunk] = []
         for score, idx in zip(scores[0], idxs[0]):
             if idx == -1:
                 continue
-            chunk = self._chunks[idx]
-            if chunk.building_id != query.building_id:
-                continue  # tenant isolation
-            results.append(RetrievedChunk(chunk=chunk, score=float(score)))
-            if len(results) >= k:
-                break
-        return results
+            out.append(RetrievedChunk(chunk=self.chunks[idx], score=float(score)))
+        return out
+
+
+class Retriever:
+    def __init__(self, embedder: Embedder | None = None) -> None:
+        self.embedder = embedder or get_embedder()
+        self._by_building: dict[str, _TenantIndex] = {}
+
+    def index(self, chunks: list[Chunk]) -> None:
+        """Group chunks by building and build one index per tenant."""
+        if not chunks:
+            raise ValueError("cannot index an empty chunk list")
+        grouped: dict[str, list[Chunk]] = {}
+        for c in chunks:
+            grouped.setdefault(c.building_id, []).append(c)
+        self._by_building = {
+            bid: _TenantIndex(cs, self.embedder) for bid, cs in grouped.items()
+        }
+
+    def retrieve(self, query: Query, k: int = 4) -> list[RetrievedChunk]:
+        """Return the top-k chunks for a query, from that building's index only."""
+        tenant = self._by_building.get(query.building_id)
+        if tenant is None:
+            return []  # unknown building -> no context (never leak other tenants)
+        qv = _as_faiss(self.embedder.embed([query.text]))
+        return tenant.search(qv, k)
