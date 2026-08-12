@@ -9,11 +9,14 @@ pair. Prometheus metrics are exposed at /metrics.
 """
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel
 
+from bems_rag.monitoring.metrics import record_request
 from bems_rag.pipeline import RagPipeline
 from bems_rag.serving.router import RoutingConfig, route_to_challenger, runs_challenger
 from bems_rag.types import Query
@@ -47,8 +50,13 @@ def create_app(state: ServingState) -> FastAPI:
     def health() -> dict:
         return {"status": "ok", "stage": state.config.stage.value}
 
+    @app.get("/metrics")
+    def metrics() -> Response:
+        return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
     @app.post("/answer", response_model=AnswerResponse)
     def answer(req: AnswerRequest) -> AnswerResponse:
+        start = time.perf_counter()
         query = Query(req.text, req.building_id)
 
         # Run challenger if it should execute (served or shadow-logged).
@@ -76,6 +84,7 @@ def create_app(state: ServingState) -> FastAPI:
                     "challenger_grounded": challenger_ans.grounded,
                 })
 
+        record_request(served_by, time.perf_counter() - start, ans.grounded)
         return AnswerResponse(
             text=ans.text,
             grounded=ans.grounded,
