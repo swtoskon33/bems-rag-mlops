@@ -31,3 +31,6 @@ indexes/
 .DS_Store
 .idea/
 .vscode/
+
+# MLflow local DB
+mlflow.db
