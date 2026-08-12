@@ -25,6 +25,8 @@ shows the parts that matter:
 - Offline evaluation: retrieval (hit@k, MRR) and generation (groundedness) on a golden
   set, logged to MLflow, written to a committed report.
 - Multi-tenant retrieval: each building searches only its own chunks.
+- Versioned promotion: each RAG config is a registered MLflow model version with
+  champion/challenger aliases; promotion is an alias flip, with rollback.
 - Reproducible & offline-first: deterministic embeddings and a template generator mean
   the whole pipeline and its tests run with no API key.
 
@@ -69,8 +71,8 @@ Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
       ingest/          BDG2 metadata -> document chunks
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
-      eval/            metrics (hit@k, MRR, groundedness) + harness
-    tests/             unit, data, integration (46 tests)
+      eval/            metrics + harness + MLflow model registry (promotion/rollback)
+    tests/             unit, data, integration (50 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -78,8 +80,9 @@ Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (46 tests)
+- [x] Test tiers: unit / data / integration (50 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
+- [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)
 - [x] Drift detection (PSI) + monitoring (Prometheus metrics)
 - [x] Dockerfile + CI/CD and drift runbooks
