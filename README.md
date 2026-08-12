@@ -70,23 +70,23 @@ Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics (hit@k, MRR, groundedness) + harness
-    tests/             unit, data, integration   (incoming)
+    tests/             unit, data, integration (46 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
-    docs/              eval report, architecture, CI/CD & drift runbooks (incoming)
+    docs/              eval report + CI/CD and drift runbooks
 
 ## Roadmap
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [ ] Test tiers: unit / data (Great Expectations) / integration
-- [ ] Champion/challenger validation gate
-- [ ] CI (PR-gated tests + build) and CD (shadow -> canary -> rollback)
-- [ ] Drift detection (Evidently) + monitoring (Prometheus/Grafana)
+- [x] Test tiers: unit / data / integration (46 tests)
+- [x] Champion/challenger validation gate (no per-building regression)
+- [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)
+- [x] Drift detection (PSI) + monitoring (Prometheus metrics)
+- [x] Dockerfile + CI/CD and drift runbooks
 
 ## Stack
 
-Python 3.11, FAISS, MLflow, FastAPI, pytest (incoming: Docker, GitHub Actions,
-Great Expectations, Evidently, Prometheus, Grafana).
+Python 3.11, FAISS, MLflow, FastAPI, pytest, Docker, GitHub Actions, Prometheus.
 
 ## License
 
