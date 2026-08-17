@@ -1,6 +1,6 @@
 {
   "hit_at_k": 1.0,
-  "mrr": 0.9,
+  "mrr": 1.0,
   "groundedness": 1.0,
-  "n_queries": 5.0
+  "n_queries": 25.0
 }

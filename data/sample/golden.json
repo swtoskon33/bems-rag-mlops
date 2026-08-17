@@ -1,16 +1,331 @@
 {
   "chunks": [
-    {"id": "b1_solar", "text": "solar produced 320 kWh at noon on clear days", "kind": "telemetry", "building_id": "b1"},
-    {"id": "b1_chiller", "text": "the chiller requires monthly maintenance in summer", "kind": "document", "building_id": "b1"},
-    {"id": "b1_hvac", "text": "HVAC setpoint is 22 degrees during occupied hours", "kind": "document", "building_id": "b1"},
-    {"id": "b2_wind", "text": "wind turbine output was 45 kWh overnight", "kind": "telemetry", "building_id": "b2"},
-    {"id": "b2_ev", "text": "EV chargers drew 60 kWh during the evening peak", "kind": "telemetry", "building_id": "b2"}
+    {
+      "id": "Panther_lodging_Dean_meta",
+      "text": "Building Panther_lodging_Dean is a lodging/residential facility. It has a floor area of 508.8 square meters. It was built in 1989. Its energy use intensity (EUI) is 271. Metered energy sources: irrigation, gas.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Dean"
+    },
+    {
+      "id": "Panther_lodging_Shelia_meta",
+      "text": "Building Panther_lodging_Shelia is a lodging/residential facility. It has a floor area of 929.0 square meters. It was built in 1992. Its energy use intensity (EUI) is 62. Metered energy sources: irrigation.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Shelia"
+    },
+    {
+      "id": "Panther_lodging_Ricky_meta",
+      "text": "Building Panther_lodging_Ricky is a lodging/residential facility. It has a floor area of 483.1 square meters. It was built in 2016. Its energy use intensity (EUI) is 534. Metered energy sources: irrigation, gas.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Ricky"
+    },
+    {
+      "id": "Panther_education_Rosalie_meta",
+      "text": "Building Panther_education_Rosalie is a education facility. It has a floor area of 690.5 square meters. It was built in 2008. Its energy use intensity (EUI) is 276. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Rosalie"
+    },
+    {
+      "id": "Panther_education_Misty_meta",
+      "text": "Building Panther_education_Misty is a education facility. It has a floor area of 252.7 square meters. It was built in 2004. Its energy use intensity (EUI) is 375. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Misty"
+    },
+    {
+      "id": "Panther_office_Daina_meta",
+      "text": "Building Panther_office_Daina is a office facility. It has a floor area of 133.8 square meters. It was built in 1983. Its energy use intensity (EUI) is 1983. Metered energy sources: water, irrigation.",
+      "kind": "document",
+      "building_id": "Panther_office_Daina"
+    },
+    {
+      "id": "Panther_education_Mattie_meta",
+      "text": "Building Panther_education_Mattie is a education facility. It has a floor area of 499.4 square meters. It was built in 1991. Its energy use intensity (EUI) is 49. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Mattie"
+    },
+    {
+      "id": "Panther_office_Woodrow_meta",
+      "text": "Building Panther_office_Woodrow is a office facility. It has a floor area of 537.8 square meters. It was built in 1996. Its energy use intensity (EUI) is 136. Metered energy sources: water, irrigation.",
+      "kind": "document",
+      "building_id": "Panther_office_Woodrow"
+    },
+    {
+      "id": "Panther_education_Diann_meta",
+      "text": "Building Panther_education_Diann is a education facility. It has a floor area of 2200.4 square meters. It was built in 2002. Its energy use intensity (EUI) is 145. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Diann"
+    },
+    {
+      "id": "Panther_education_Gina_meta",
+      "text": "Building Panther_education_Gina is a education facility. It has a floor area of 10833.1 square meters. It was built in 1975. Its energy use intensity (EUI) is 546. Metered energy sources: electricity, water, gas.",
+      "kind": "document",
+      "building_id": "Panther_education_Gina"
+    },
+    {
+      "id": "Panther_education_Tina_meta",
+      "text": "Building Panther_education_Tina is a education facility. It has a floor area of 743.2 square meters. It was built in 2000. Its energy use intensity (EUI) is 41. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Tina"
+    },
+    {
+      "id": "Panther_lodging_Russell_meta",
+      "text": "Building Panther_lodging_Russell is a lodging/residential facility. It has a floor area of 2594.4 square meters. It was built in 1981. Its energy use intensity (EUI) is 58. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Russell"
+    },
+    {
+      "id": "Panther_education_Guillermina_meta",
+      "text": "Building Panther_education_Guillermina is a education facility. It has a floor area of 2064.3 square meters. It was built in 2002. Its energy use intensity (EUI) is 80. Metered energy sources: water.",
+      "kind": "document",
+      "building_id": "Panther_education_Guillermina"
+    },
+    {
+      "id": "Panther_lodging_Amos_meta",
+      "text": "Building Panther_lodging_Amos is a lodging/residential facility. It has a floor area of 1337.2 square meters. It was built in 1997. Its energy use intensity (EUI) is 19. Metered energy sources: water, gas.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Amos"
+    },
+    {
+      "id": "Panther_education_Vincent_meta",
+      "text": "Building Panther_education_Vincent is a education facility. It has a floor area of 11248.1 square meters. It was built in 1989. Its energy use intensity (EUI) is 128. Metered energy sources: electricity, chilledwater, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Vincent"
+    },
+    {
+      "id": "Panther_education_Shelton_meta",
+      "text": "Building Panther_education_Shelton is a education facility. It has a floor area of 5649.3 square meters. It was built in 2003. Its energy use intensity (EUI) is 133. Metered energy sources: electricity.",
+      "kind": "document",
+      "building_id": "Panther_education_Shelton"
+    },
+    {
+      "id": "Panther_office_Karla_meta",
+      "text": "Building Panther_office_Karla is a office facility. It has a floor area of 2508.4 square meters. It was built in 2010. Its energy use intensity (EUI) is 120. Metered energy sources: electricity, chilledwater, water.",
+      "kind": "document",
+      "building_id": "Panther_office_Karla"
+    },
+    {
+      "id": "Panther_assembly_Denice_meta",
+      "text": "Building Panther_assembly_Denice is a entertainment/public assembly facility. It has a floor area of 34445.9 square meters. It was built in 1991. Its energy use intensity (EUI) is 134. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_assembly_Denice"
+    },
+    {
+      "id": "Panther_education_Sophia_meta",
+      "text": "Building Panther_education_Sophia is a education facility. It has a floor area of 4559.0 square meters. It was built in 1968. Its energy use intensity (EUI) is 466. Metered energy sources: electricity, water, gas.",
+      "kind": "document",
+      "building_id": "Panther_education_Sophia"
+    },
+    {
+      "id": "Panther_lodging_Bonnie_meta",
+      "text": "Building Panther_lodging_Bonnie is a lodging/residential facility. It has a floor area of 1290.4 square meters. It was built in 2013. Its energy use intensity (EUI) is 51. Metered energy sources: water, irrigation.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Bonnie"
+    },
+    {
+      "id": "Panther_lodging_Willa_meta",
+      "text": "Building Panther_lodging_Willa is a lodging/residential facility. It has a floor area of 3446.7 square meters. It was built in 1999. Its energy use intensity (EUI) is 162. Metered energy sources: electricity, water.",
+      "kind": "document",
+      "building_id": "Panther_lodging_Willa"
+    },
+    {
+      "id": "Panther_education_Annetta_meta",
+      "text": "Building Panther_education_Annetta is a education facility. It has a floor area of 9232.7 square meters. It was built in 2000. Its energy use intensity (EUI) is 95. Metered energy sources: electricity, chilledwater, water.",
+      "kind": "document",
+      "building_id": "Panther_education_Annetta"
+    },
+    {
+      "id": "Panther_education_Aurora_meta",
+      "text": "Building Panther_education_Aurora is a education facility. It has a floor area of 8012.9 square meters. It was built in 2013. Its energy use intensity (EUI) is 136. Metered energy sources: electricity, chilledwater, water, irrigation.",
+      "kind": "document",
+      "building_id": "Panther_education_Aurora"
+    },
+    {
+      "id": "Panther_office_Graham_meta",
+      "text": "Building Panther_office_Graham is a office facility. It has a floor area of 7799.9 square meters. It was built in 1974. Its energy use intensity (EUI) is 104. Metered energy sources: electricity, chilledwater, water, gas.",
+      "kind": "document",
+      "building_id": "Panther_office_Graham"
+    },
+    {
+      "id": "Panther_education_Karri_meta",
+      "text": "Building Panther_education_Karri is a education facility. It has a floor area of 5076.6 square meters. It was built in 1996. Its energy use intensity (EUI) is 436. Metered energy sources: electricity, irrigation.",
+      "kind": "document",
+      "building_id": "Panther_education_Karri"
+    }
   ],
   "queries": [
-    {"text": "how much solar did we produce?", "building_id": "b1", "relevant_ids": ["b1_solar"]},
-    {"text": "when does the chiller need maintenance?", "building_id": "b1", "relevant_ids": ["b1_chiller"]},
-    {"text": "what is the HVAC setpoint?", "building_id": "b1", "relevant_ids": ["b1_hvac"]},
-    {"text": "what was the wind output?", "building_id": "b2", "relevant_ids": ["b2_wind"]},
-    {"text": "how much did EV charging use?", "building_id": "b2", "relevant_ids": ["b2_ev"]}
+    {
+      "text": "what is the floor area of this building?",
+      "building_id": "Panther_lodging_Dean",
+      "relevant_ids": [
+        "Panther_lodging_Dean_meta"
+      ]
+    },
+    {
+      "text": "when was this building built?",
+      "building_id": "Panther_lodging_Shelia",
+      "relevant_ids": [
+        "Panther_lodging_Shelia_meta"
+      ]
+    },
+    {
+      "text": "what energy sources does this building have?",
+      "building_id": "Panther_lodging_Ricky",
+      "relevant_ids": [
+        "Panther_lodging_Ricky_meta"
+      ]
+    },
+    {
+      "text": "what is the energy use intensity?",
+      "building_id": "Panther_education_Rosalie",
+      "relevant_ids": [
+        "Panther_education_Rosalie_meta"
+      ]
+    },
+    {
+      "text": "what type of facility is this?",
+      "building_id": "Panther_education_Misty",
+      "relevant_ids": [
+        "Panther_education_Misty_meta"
+      ]
+    },
+    {
+      "text": "what is the floor area of this building?",
+      "building_id": "Panther_office_Daina",
+      "relevant_ids": [
+        "Panther_office_Daina_meta"
+      ]
+    },
+    {
+      "text": "when was this building built?",
+      "building_id": "Panther_education_Mattie",
+      "relevant_ids": [
+        "Panther_education_Mattie_meta"
+      ]
+    },
+    {
+      "text": "what energy sources does this building have?",
+      "building_id": "Panther_office_Woodrow",
+      "relevant_ids": [
+        "Panther_office_Woodrow_meta"
+      ]
+    },
+    {
+      "text": "what is the energy use intensity?",
+      "building_id": "Panther_education_Diann",
+      "relevant_ids": [
+        "Panther_education_Diann_meta"
+      ]
+    },
+    {
+      "text": "what type of facility is this?",
+      "building_id": "Panther_education_Gina",
+      "relevant_ids": [
+        "Panther_education_Gina_meta"
+      ]
+    },
+    {
+      "text": "what is the floor area of this building?",
+      "building_id": "Panther_education_Tina",
+      "relevant_ids": [
+        "Panther_education_Tina_meta"
+      ]
+    },
+    {
+      "text": "when was this building built?",
+      "building_id": "Panther_lodging_Russell",
+      "relevant_ids": [
+        "Panther_lodging_Russell_meta"
+      ]
+    },
+    {
+      "text": "what energy sources does this building have?",
+      "building_id": "Panther_education_Guillermina",
+      "relevant_ids": [
+        "Panther_education_Guillermina_meta"
+      ]
+    },
+    {
+      "text": "what is the energy use intensity?",
+      "building_id": "Panther_lodging_Amos",
+      "relevant_ids": [
+        "Panther_lodging_Amos_meta"
+      ]
+    },
+    {
+      "text": "what type of facility is this?",
+      "building_id": "Panther_education_Vincent",
+      "relevant_ids": [
+        "Panther_education_Vincent_meta"
+      ]
+    },
+    {
+      "text": "what is the floor area of this building?",
+      "building_id": "Panther_education_Shelton",
+      "relevant_ids": [
+        "Panther_education_Shelton_meta"
+      ]
+    },
+    {
+      "text": "when was this building built?",
+      "building_id": "Panther_office_Karla",
+      "relevant_ids": [
+        "Panther_office_Karla_meta"
+      ]
+    },
+    {
+      "text": "what energy sources does this building have?",
+      "building_id": "Panther_assembly_Denice",
+      "relevant_ids": [
+        "Panther_assembly_Denice_meta"
+      ]
+    },
+    {
+      "text": "what is the energy use intensity?",
+      "building_id": "Panther_education_Sophia",
+      "relevant_ids": [
+        "Panther_education_Sophia_meta"
+      ]
+    },
+    {
+      "text": "what type of facility is this?",
+      "building_id": "Panther_lodging_Bonnie",
+      "relevant_ids": [
+        "Panther_lodging_Bonnie_meta"
+      ]
+    },
+    {
+      "text": "what is the floor area of this building?",
+      "building_id": "Panther_lodging_Willa",
+      "relevant_ids": [
+        "Panther_lodging_Willa_meta"
+      ]
+    },
+    {
+      "text": "when was this building built?",
+      "building_id": "Panther_education_Annetta",
+      "relevant_ids": [
+        "Panther_education_Annetta_meta"
+      ]
+    },
+    {
+      "text": "what energy sources does this building have?",
+      "building_id": "Panther_education_Aurora",
+      "relevant_ids": [
+        "Panther_education_Aurora_meta"
+      ]
+    },
+    {
+      "text": "what is the energy use intensity?",
+      "building_id": "Panther_office_Graham",
+      "relevant_ids": [
+        "Panther_office_Graham_meta"
+      ]
+    },
+    {
+      "text": "what type of facility is this?",
+      "building_id": "Panther_education_Karri",
+      "relevant_ids": [
+        "Panther_education_Karri_meta"
+      ]
+    }
   ]
 }
