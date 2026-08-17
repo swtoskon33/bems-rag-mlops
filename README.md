@@ -54,6 +54,8 @@ in production:
 
 ## Results
 
+![Evaluation dashboard](docs/eval_dashboard.png)
+
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
 Current golden-set scores (25 real-building queries): hit@k 1.00, MRR 1.00, groundedness 1.00.
 
