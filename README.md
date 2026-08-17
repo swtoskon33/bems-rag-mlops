@@ -27,6 +27,9 @@ shows the parts that matter:
 - Multi-tenant retrieval: each building searches only its own chunks.
 - Versioned promotion: each RAG config is a registered MLflow model version with
   champion/challenger aliases; promotion is an alias flip, with rollback.
+- Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
+- Drift: query-length PSI plus embedding-centroid distance (a semantic signal).
+- Groundedness: a numeric guard plus a semantic content-overlap check.
 - Reproducible & offline-first: deterministic embeddings and a template generator mean
   the whole pipeline and its tests run with no API key.
 
@@ -52,7 +55,7 @@ in production:
 ## Results
 
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
+Current golden-set scores (25 real-building queries): hit@k 1.00, MRR 1.00, groundedness 1.00.
 
 ## Quickstart
 
@@ -72,7 +75,7 @@ Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics + harness + MLflow model registry (promotion/rollback)
-    tests/             unit, data, integration (50 tests)
+    tests/             unit, data, integration (60 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -80,11 +83,14 @@ Current golden-set scores: hit@k 1.00, MRR 0.90, groundedness 1.00.
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (50 tests)
+- [x] Test tiers: unit / data / integration (60 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
 - [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)
-- [x] Drift detection (PSI) + monitoring (Prometheus metrics)
+- [x] Drift detection: query-length PSI + embedding-centroid distance
+- [x] Monitoring (Prometheus metrics)
+- [x] Automated CD workflow: eval -> gate -> promote (with rollback primitives)
+- [x] Groundedness: numeric guard + semantic overlap check
 - [x] Dockerfile + CI/CD and drift runbooks
 
 ## Stack
