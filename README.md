@@ -54,10 +54,27 @@ in production:
 
 ## Results
 
-![Evaluation dashboard](docs/eval_dashboard.png)
-
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
 Current golden-set scores (25 real-building queries): hit@k 1.00, MRR 1.00, groundedness 1.00.
+
+## MLflow tracking
+
+Real runs logged to the MLflow tracking server and registry (regenerate with `python scripts/populate_mlflow.py`).
+
+### Eval runs
+
+| Run | k | hit@k | MRR | groundedness |
+|-----|---|-------|-----|--------------|
+| baseline-k2 | 2 | 1.00 | 1.00 | 1.00 |
+| k4 | 4 | 1.00 | 1.00 | 1.00 |
+| k6 | 6 | 1.00 | 1.00 | 1.00 |
+
+### Model registry (bems-rag)
+
+| Alias | Version |
+|-------|---------|
+| champion | v2 |
+| challenger | v3 |
 
 ## Quickstart
 
