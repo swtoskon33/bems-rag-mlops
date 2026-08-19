@@ -9,7 +9,7 @@ then materialise the assets from the UI, or from the CLI.
 """
 from __future__ import annotations
 
-from dagster import asset, Definitions, define_asset_job, ScheduleDefinition
+from dagster import Definitions, ScheduleDefinition, asset, define_asset_job
 
 from bems_rag.eval.harness import evaluate
 from bems_rag.eval.validation_gate import CandidateMetrics, evaluate_gate

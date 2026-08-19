@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")  # headless, no display needed
 import matplotlib.pyplot as plt
 

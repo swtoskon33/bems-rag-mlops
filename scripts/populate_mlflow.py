@@ -10,6 +10,7 @@ shows real tracking and a real registry, not a mock.
 from __future__ import annotations
 
 import mlflow
+
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_registry_uri("sqlite:///mlflow.db")
 
@@ -45,7 +46,7 @@ def main() -> None:
     r3 = _run("k6", k=6)
 
     print("registering versions...")
-    v1 = reg.register(r1, {"hit_at_k": 0.90})
+    reg.register(r1, {"hit_at_k": 0.90})
     v2 = reg.register(r2, {"hit_at_k": 1.00})
     v3 = reg.register(r3, {"hit_at_k": 1.00})
 

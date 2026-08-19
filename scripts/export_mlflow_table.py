@@ -4,8 +4,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import mlflow
+
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_registry_uri("sqlite:///mlflow.db")
+from mlflow.exceptions import MlflowException
 from mlflow.tracking import MlflowClient
 
 OUT = Path("docs/mlflow_runs.md")
@@ -18,8 +20,8 @@ def main() -> None:
     lines = [
         "## MLflow tracking",
         "",
-        "Real runs logged to the MLflow tracking server and registry "
-        "(regenerate with `python scripts/populate_mlflow.py`).",
+        ("Real runs logged to the MLflow tracking server and registry "
+        "(regenerate with `python scripts/populate_mlflow.py`)."),
         "",
         "### Eval runs",
         "",
@@ -39,11 +41,12 @@ def main() -> None:
     lines += ["", "### Model registry (bems-rag)", "",
               "| Alias | Version |", "|-------|---------|"]
     for alias in ("champion", "challenger"):
+        mv = None
         try:
             mv = client.get_model_version_by_alias("bems-rag", alias)
-            lines.append(f"| {alias} | v{mv.version} |")
-        except Exception:
-            pass
+        except MlflowException:
+            continue
+        lines.append(f"| {alias} | v{mv.version} |")
 
     OUT.write_text("\n".join(lines) + "\n")
     print(f"wrote {OUT}\n")
