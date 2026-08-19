@@ -19,6 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+orchestration = ["dagster>=1.7", "dagster-webserver>=1.7"]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
