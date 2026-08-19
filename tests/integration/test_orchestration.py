@@ -1,5 +1,11 @@
-"""Integration test: the Dagster asset graph runs end to end."""
+"""Integration test: the Dagster asset graph runs end to end.
+
+Skipped when dagster isn't installed (it's an optional 'orchestration' extra), so the
+core CI stays lightweight.
+"""
 import pytest
+
+pytest.importorskip("dagster")
 
 from bems_rag.orchestration.dagster_pipeline import (
     eval_report,
@@ -11,7 +17,6 @@ pytestmark = pytest.mark.integration
 
 
 def test_dagster_assets_run_end_to_end():
-    # Materialise the assets in dependency order by calling them directly.
     report = eval_report()
     assert set(report) == {"hit_at_k", "mrr", "groundedness"}
 
