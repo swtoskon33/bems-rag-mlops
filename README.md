@@ -31,9 +31,9 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
   |  25 real queries     challenger; no     promote/rollback   shadow/   |
   |                      per-bldg regress                      canary    |
   |                                                                     |
-  |  Drift              Monitoring         CI / CD           Docker      |
-  |  PSI + embedding    Prometheus         tests +           one image:  |
-  |  centroid           /metrics           eval-gate-promote  all stages |
+  |  Drift              Monitoring         CI/CD + Dagster   Docker      |
+  |  PSI + embedding    Prometheus         tests, eval-gate  one image:  |
+  |  centroid           /metrics           -promote; DAG     all stages  |
   |                                                                     |
   +---------------------------------------------------------------------+
 ```
@@ -53,6 +53,8 @@ deployment, monitoring, and retraining. The parts included:
 - Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
 - Drift: query-length PSI plus embedding-centroid distance (a semantic signal).
 - Groundedness: a numeric guard plus a semantic content-overlap check.
+- Orchestration: the eval -> gate -> promote loop is a Dagster asset graph with a
+  daily schedule (see docs/orchestration.md).
 - Reproducible & offline-first: deterministic embeddings and a template generator mean
   the whole pipeline and its tests run with no API key.
 
