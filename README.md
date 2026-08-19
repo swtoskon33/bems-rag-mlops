@@ -15,6 +15,9 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
 > A sanitised, public reference inspired by a private building-energy RAG system.
 > The modelling is deliberately simple; the focus is the MLOps scaffolding around it.
 
+
+![Architecture](docs/architecture.svg)
+
 ## Why this exists
 
 RAG demos are easy; knowing whether a RAG system is good is the hard part. This repo
@@ -51,6 +54,50 @@ in production:
 |------------|------------------------------|-----------------------------------------|
 | Embeddings | HashingEmbedder (det.)       | OpenAIEmbedder (EMBEDDING_BACKEND=openai)|
 | Generation | TemplateGenerator            | OpenAIGenerator (GENERATION_BACKEND=openai)|
+
+## Example: querying the API
+
+```bash
+curl -X POST localhost:8000/answer \
+  -H "Content-Type: application/json" \
+  -d '{"building_id": "Panther_lodging_Dean", "question": "what is the floor area?"}'
+```
+
+```json
+{
+  "building_id": "Panther_lodging_Dean",
+  "answer": "Panther_lodging_Dean has a floor area of 508.8 m2, built in 1989.",
+  "grounded": true,
+  "served_by": "champion"
+}
+```
+
+The answer is tenant-scoped (only this building's data) and `grounded` is `false` if any
+figure can't be traced to retrieved context.
+
+## Design decisions & trade-offs
+
+Choices made deliberately, and what each one trades off:
+
+- **Offline-first model (hashing embeddings + template generator).** Keeps the whole
+  pipeline and its tests reproducible and runnable in CI with no API key. Trade-off:
+  weaker semantic quality than real embeddings. Both backends are pluggable via
+  `EMBEDDING_BACKEND` / `GENERATION_BACKEND`, so swapping in OpenAI is one env var.
+- **Deliberately simple modelling.** The focus is the MLOps scaffolding, not the model.
+  Trade-off: this repo doesn't showcase modelling depth (that lives in my publications) —
+  but it shows how I operate ML in production.
+- **Champion/challenger compares RAG configs, not trained networks.** The versioned
+  artifact is a configuration (embeddings, k, chunking) plus its eval metrics. Trade-off:
+  no gradient training loop; the point is the promotion/rollback machinery.
+- **Tenant-first retrieval (one index per building).** Guarantees isolation and avoids a
+  bug where global top-k then filter returned zero results for small tenants. Trade-off:
+  more indexes to hold; fine at this scale, would revisit with a shared ANN index at very
+  large tenant counts.
+- **Dual groundedness (numeric regex + semantic overlap).** Cheap, deterministic, offline.
+  Trade-off: not a full NLI entailment check — a documented approximation.
+- **Dual drift (query-length PSI + embedding centroid).** PSI is a light proxy; the
+  embedding signal catches topic shift. Trade-off: with hashing embeddings only the
+  relative ordering is meaningful (documented in the drift module).
 
 ## Results
 
