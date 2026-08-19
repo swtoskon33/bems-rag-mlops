@@ -16,7 +16,27 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
 > The modelling is deliberately simple; the focus is the MLOps scaffolding around it.
 
 
-![Architecture](docs/architecture.svg)
+```
+                         RAG request path
+  Operator query ──> Retrieve ────> Generate ────> Groundedness ──> Answer
+  building_id +       per-tenant    template/       numeric +        grounded=T/F
+  question            FAISS         OpenAI          semantic
+
+  Data:  BDG2 ingest (1,636 real buildings)  ──>  one FAISS index per tenant
+
+  +-- MLOps scaffolding ------------------------------------------------+
+  |                                                                     |
+  |  Eval harness       Validation gate    MLflow registry    Serving   |
+  |  hit@k MRR grnd      champion vs        versions+aliases   FastAPI   |
+  |  25 real queries     challenger; no     promote/rollback   shadow/   |
+  |                      per-bldg regress                      canary    |
+  |                                                                     |
+  |  Drift              Monitoring         CI / CD           Docker      |
+  |  PSI + embedding    Prometheus         tests +           one image:  |
+  |  centroid           /metrics           eval-gate-promote  all stages |
+  |                                                                     |
+  +---------------------------------------------------------------------+
+```
 
 ## Why this exists
 
