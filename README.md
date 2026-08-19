@@ -38,10 +38,10 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
   +---------------------------------------------------------------------+
 ```
 
-## Why this exists
+## Overview
 
-RAG demos are easy; knowing whether a RAG system is good is the hard part. This repo
-shows the parts that matter:
+A RAG system for building-energy questions, with the surrounding MLOps: evaluation,
+deployment, monitoring, and retraining. The parts included:
 
 - Grounded generation: every number in an answer must trace back to retrieved context,
   or the answer is flagged (grounded=False). Guards against invented figures.
