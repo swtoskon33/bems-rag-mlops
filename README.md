@@ -53,6 +53,8 @@ deployment, monitoring, and retraining. The parts included:
 - Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
 - Drift: query-length PSI plus embedding-centroid distance (a semantic signal).
 - Groundedness: a numeric guard plus a semantic content-overlap check.
+- Frontend: a React + Vite query playground (frontend/) — pick a building, ask a
+  question, see the grounded answer, served-by model, and round-trip latency.
 - Orchestration: the eval -> gate -> promote loop is a Dagster asset graph with a
   daily schedule (see docs/orchestration.md).
 - Reproducible & offline-first: deterministic embeddings and a template generator mean
@@ -96,6 +98,17 @@ curl -X POST localhost:8000/answer \
 
 The answer is tenant-scoped (only this building's data) and `grounded` is `false` if any
 figure can't be traced to retrieved context.
+
+## Frontend
+
+A React + Vite UI (`frontend/`) sits on top of the serving API — building selector,
+question box, grounded/ungrounded badge, which model served the answer, and per-query
+latency.
+
+```bash
+python scripts/serve.py          # backend on :8000
+cd frontend && npm install && npm run dev   # UI on :5173
+```
 
 ## Design decisions & trade-offs
 
