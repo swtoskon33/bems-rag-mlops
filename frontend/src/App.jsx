@@ -1,36 +1,46 @@
 import { useState } from "react";
 import "./App.css";
 
-// Point this at the FastAPI backend (bems-rag serving app).
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-// A few real BDG2 building ids to try.
 const SAMPLE_BUILDINGS = [
   "Panther_lodging_Dean",
   "Panther_office_Hannah",
   "Robin_education_Estella",
 ];
 
+const SAMPLE_QUESTIONS = [
+  "What is the floor area?",
+  "When was this building built?",
+  "What energy sources does it use?",
+  "What is the energy use intensity?",
+];
+
 export default function App() {
   const [buildingId, setBuildingId] = useState(SAMPLE_BUILDINGS[0]);
-  const [question, setQuestion] = useState("What is the floor area?");
+  const [question, setQuestion] = useState(SAMPLE_QUESTIONS[0]);
   const [answer, setAnswer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [latency, setLatency] = useState(null);
 
-  async function ask() {
+  async function ask(q) {
+    const asked = q ?? question;
     setLoading(true);
     setError(null);
     setAnswer(null);
+    setLatency(null);
+    const start = performance.now();
     try {
       const res = await fetch(`${API_URL}/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ building_id: buildingId, text: question }),
+        body: JSON.stringify({ building_id: buildingId, text: asked }),
       });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
       setAnswer(data);
+      setLatency(Math.round(performance.now() - start));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -64,11 +74,24 @@ export default function App() {
             type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && ask()}
             placeholder="Ask about this building…"
           />
         </label>
 
-        <button onClick={ask} disabled={loading || !question.trim()}>
+        <div className="chips">
+          {SAMPLE_QUESTIONS.map((q) => (
+            <button
+              key={q}
+              className="chip"
+              onClick={() => { setQuestion(q); ask(q); }}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+
+        <button className="primary" onClick={() => ask()} disabled={loading || !question.trim()}>
           {loading ? "Asking…" : "Ask"}
         </button>
       </section>
@@ -82,6 +105,7 @@ export default function App() {
               {answer.grounded ? "grounded" : "ungrounded"}
             </span>
             <span className="served">served by {answer.served_by}</span>
+            {latency != null && <span className="latency">{latency} ms</span>}
           </div>
           <p className="answer-text">{answer.text}</p>
           <div className="meta">

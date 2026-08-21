@@ -154,3 +154,41 @@ footer {
   color: var(--grey);
   text-align: center;
 }
+
+/* Sample question chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 12px;
+  background: #eef2f7;
+  color: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  background: #e0e8f2;
+  border-color: var(--accent);
+}
+
+.primary { align-self: flex-start; }
+
+/* Latency badge in the answer header */
+.latency {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grey);
+  font-family: "SF Mono", ui-monospace, Menlo, monospace;
+  background: #f0f3f8;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
