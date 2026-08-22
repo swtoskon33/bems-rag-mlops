@@ -269,7 +269,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics + harness + MLflow model registry (promotion/rollback)
-    tests/             unit, data, integration (64 tests)
+    tests/             unit, data, integration (67 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -277,7 +277,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (64 tests)
+- [x] Test tiers: unit / data / integration (67 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
 - [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)
