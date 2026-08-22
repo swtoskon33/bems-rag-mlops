@@ -12,6 +12,7 @@ from __future__ import annotations
 from dagster import Definitions, ScheduleDefinition, asset, define_asset_job
 
 from bems_rag.eval.harness import evaluate
+from bems_rag.eval.registry import Registry
 from bems_rag.eval.validation_gate import CandidateMetrics, evaluate_gate
 from bems_rag.pipeline import RagPipeline
 
@@ -26,15 +27,35 @@ def eval_report() -> dict:
             "groundedness": report.groundedness}
 
 
+def _champion_metrics(registry: Registry) -> CandidateMetrics | None:
+    """Read the live champion's metrics from the registry (None if none yet).
+
+    Shared logic with scripts/cd_promote.py: the orchestrated path must gate against
+    the same real champion, not a hardcoded baseline.
+    """
+    version = registry.get_alias_version("champion")
+    if version is None:
+        return None
+    m = registry.get_version_metrics(version)
+    if not {"hit_at_k", "mrr", "groundedness"} <= m.keys():
+        return None
+    return CandidateMetrics(
+        hit_at_k=m["hit_at_k"], mrr=m["mrr"], groundedness=m["groundedness"]
+    )
+
+
 @asset
 def gate_decision(eval_report: dict) -> dict:
-    """Compare the challenger to a champion baseline via the validation gate."""
-    champion = CandidateMetrics(hit_at_k=0.80, mrr=0.75, groundedness=1.0)
+    """Compare the challenger to the live champion via the validation gate."""
     challenger = CandidateMetrics(
         hit_at_k=eval_report["hit_at_k"],
         mrr=eval_report["mrr"],
         groundedness=eval_report["groundedness"],
     )
+    champion = _champion_metrics(Registry())
+    if champion is None:
+        # No champion registered yet -> first deploy, auto-pass.
+        return {"passed": True, "reasons": ["no champion yet (first deploy)"]}
     decision = evaluate_gate(champion, challenger)
     return {"passed": decision.passed, "reasons": decision.reasons}
 
