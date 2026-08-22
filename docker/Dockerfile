@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 8000
 
 # Default: serve the API. Override the command to run eval instead.
-CMD ["uvicorn", "bems_rag.serving.app:create_app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "bems_rag.serving.main:app", "--host", "0.0.0.0", "--port", "8000"]

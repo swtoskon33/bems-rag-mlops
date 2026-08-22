@@ -17,7 +17,6 @@ import numpy as np
 
 from bems_rag.ingest.bdg2 import load_bdg2_facet_chunks
 from bems_rag.retrieval.embeddings import get_embedder
-from bems_rag.types import Chunk
 
 OUT = Path("docs/ann_rag_quality.md")
 K = 4
@@ -78,13 +77,22 @@ def main() -> None:
     rows = [(kind, eval_index(kind)) for kind in ("Flat", "HNSW", "IVF", "IVF-PQ")]
     flat_hit = rows[0][1]
 
+    intro = (
+        "How approximate retrieval affects the end-to-end answer, not just index "
+        f"recall. Global corpus ({n} chunks, all buildings, dim {d}); {len(queries)} "
+        f"golden queries; answer hit@{K} on retrieved contexts. Flat (exact) is the "
+        "reference; the drop column is the RAG-quality cost of approximation."
+    )
+    intro = (
+        "How approximate retrieval affects the end-to-end answer, not just index "
+        f"recall. Global corpus ({n} chunks, all buildings, dim {d}); {len(queries)} "
+        f"golden queries; answer hit@{K} on retrieved contexts. Flat (exact) is the "
+        "reference; the drop column is the RAG-quality cost of approximation."
+    )
     lines = [
         "# ANN approximation -> RAG answer quality",
         "",
-        f"How approximate retrieval affects the *end-to-end* answer, not just index "
-        f"recall. Global corpus ({n} chunks, all buildings, dim {d}); {len(queries)} "
-        f"golden queries; answer hit@{K} on retrieved contexts. Flat (exact) is the "
-        "reference; the drop column is the RAG-quality cost of approximation.",
+        intro,
         "",
         "| Index | Answer hit@4 | Drop vs Flat |",
         "|-------|--------------|--------------|",
@@ -92,15 +100,15 @@ def main() -> None:
     for kind, hit in rows:
         drop = flat_hit - hit
         lines.append(f"| {kind} | {hit:.3f} | {drop:+.3f} |")
-    lines += [
-        "",
-        "The engineering point: exact search isn't free at scale, and the right question "
-        "is how much answer quality you trade for lower latency/memory. Here IVF keeps "
-        "answer quality close to exact while cutting search cost; aggressive compression "
-        "(IVF-PQ) trades more. This recall -> answer-quality transfer is what actually "
-        "matters for a production RAG budget — the same methodology scales to millions of "
-        "vectors where exact search is infeasible.",
-    ]
+    note = (
+        "The engineering point: exact search isn't free at scale, and the right "
+        "question is how much answer quality you trade for lower latency/memory. Here "
+        "IVF keeps answer quality close to exact while cutting search cost; aggressive "
+        "compression (IVF-PQ) trades more. This recall -> answer-quality transfer is "
+        "what matters for a production RAG budget - the same methodology scales to "
+        "millions of vectors where exact search is infeasible."
+    )
+    lines += ["", note]
     OUT.write_text("\n".join(lines) + "\n")
     print(f"wrote {OUT}")
     for line in lines[5:11]:

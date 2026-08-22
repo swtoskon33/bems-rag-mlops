@@ -1,58 +1,76 @@
-"""CD orchestration: evaluate a challenger, gate it, and promote or roll back.
+"""CD promotion: evaluate the challenger, gate it against the live champion, promote.
 
-This is the automated deployment decision that ties the pieces together:
-  1. evaluate the current pipeline on the golden set,
-  2. register it as a model version,
-  3. run the validation gate against the champion,
-  4. promote (alias flip) if it passes, otherwise leave the champion in place.
-
-Run in CI (see .github/workflows/cd.yml) or locally:
-    python scripts/cd_promote.py
+Unlike a stub that always auto-promotes, this reads the current champion's metrics from
+the registry and only promotes the challenger if the validation gate passes. On the
+first run (no champion) the challenger is registered and promoted to seed the registry.
 """
 from __future__ import annotations
 
 import sys
 
+import mlflow
+
 from bems_rag.eval.harness import evaluate
+from bems_rag.eval.registry import Registry
 from bems_rag.eval.validation_gate import CandidateMetrics, evaluate_gate
 from bems_rag.pipeline import RagPipeline
 
 GOLDEN = "data/sample/golden.json"
 
 
-def _load_champion_metrics() -> CandidateMetrics | None:
-    """In a real system this reads the champion's metrics from the registry.
-    Here we treat 'no champion yet' as the first deploy (auto-promote)."""
-    # Kept simple: first run has no champion, so the challenger is promoted.
-    return None
+def _load_champion_metrics(registry: Registry) -> CandidateMetrics | None:
+    """Read the live champion's metrics from the registry (None if no champion yet)."""
+    version = registry.get_alias_version("champion")
+    if version is None:
+        return None
+    m = registry.get_version_metrics(version)
+    if not {"hit_at_k", "mrr", "groundedness"} <= m.keys():
+        return None
+    return CandidateMetrics(
+        hit_at_k=m["hit_at_k"], mrr=m["mrr"], groundedness=m["groundedness"]
+    )
+
+
+def _register_challenger(registry: Registry, metrics: dict[str, float]) -> str:
+    """Log a run and register the challenger config as a new version."""
+    with mlflow.start_run() as run:
+        mlflow.log_metrics(metrics)
+        version = registry.register(run.info.run_id, metrics)
+    return version
 
 
 def main() -> int:
-    # 1. Evaluate the challenger.
+    registry = Registry()
+
     report = evaluate(RagPipeline(), GOLDEN, k=4)
-    challenger = CandidateMetrics(
-        hit_at_k=report.hit_at_k,
-        mrr=report.mrr,
-        groundedness=report.groundedness,
-    )
+    metrics = {
+        "hit_at_k": report.hit_at_k,
+        "mrr": report.mrr,
+        "groundedness": report.groundedness,
+    }
+    challenger = CandidateMetrics(**metrics)
     print(f"challenger: hit@k={challenger.hit_at_k:.3f} "
           f"mrr={challenger.mrr:.3f} groundedness={challenger.groundedness:.3f}")
 
-    # 2. Compare to champion via the gate.
-    champion = _load_champion_metrics()
+    champion = _load_champion_metrics(registry)
     if champion is None:
-        print("no champion yet -> promoting challenger as first champion")
+        version = _register_challenger(registry, metrics)
+        registry.promote(version)
+        print(f"no champion yet -> registered v{version} and promoted as first champion")
         return 0
 
     decision = evaluate_gate(champion, challenger)
-    if decision.passed:
-        print("gate PASSED -> promoting challenger to champion")
-        return 0
+    if not decision.passed:
+        print("gate FAILED -> keeping current champion. reasons:")
+        for r in decision.reasons:
+            print(f"  - {r}")
+        return 1
 
-    print("gate FAILED -> keeping current champion. reasons:")
-    for r in decision.reasons:
-        print(f"  - {r}")
-    return 1  # non-zero so CI marks the promotion as blocked
+    version = _register_challenger(registry, metrics)
+    demoted = registry.promote(version)
+    print(f"gate PASSED -> promoted v{version} to champion "
+          f"(demoted v{demoted} to previous_champion)")
+    return 0
 
 
 if __name__ == "__main__":

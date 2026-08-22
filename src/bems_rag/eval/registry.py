@@ -61,6 +61,17 @@ class Registry:
         except mlflow.exceptions.MlflowException:
             return None
 
+    def get_version_metrics(self, version: str) -> dict[str, float]:
+        """Read the eval metrics previously stored as tags on a version."""
+        mv = self.client.get_model_version(self.model_name, version)
+        out: dict[str, float] = {}
+        for k, v in mv.tags.items():
+            try:
+                out[k] = float(v)
+            except (TypeError, ValueError):
+                continue
+        return out
+
     def promote(self, challenger_version: str) -> str | None:
         """Make the challenger the champion; keep the old champion as previous_champion.
 
