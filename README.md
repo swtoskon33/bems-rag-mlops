@@ -82,6 +82,9 @@ in production:
 
 ## Example: querying the API
 
+More examples (Python client, tenant isolation, switching to real models) in [docs/usage.md](docs/usage.md).
+
+
 ```bash
 curl -X POST localhost:8000/answer \
   -H "Content-Type: application/json" \
