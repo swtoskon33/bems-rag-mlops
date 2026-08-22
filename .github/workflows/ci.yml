@@ -60,6 +60,28 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: false
+          load: true
           tags: bems-rag-mlops:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Smoke test the running container
+        run: |
+          docker run -d --name bems -p 8000:8000 bems-rag-mlops:ci
+          # wait for the app to come up
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health >/dev/null; then
+              echo "health OK"; break
+            fi
+            sleep 1
+          done
+          curl -sf http://localhost:8000/health
+          # a real answer request must return 200 (guards the entrypoint bug)
+          code=$(curl -s -o /tmp/ans.json -w "%{http_code}" -X POST \
+            http://localhost:8000/answer \
+            -H "Content-Type: application/json" \
+            -d '{"building_id": "Panther_lodging_Dean", "text": "what is the floor area?"}')
+          echo "POST /answer -> $code"
+          cat /tmp/ans.json
+          test "$code" = "200"
+          docker rm -f bems
