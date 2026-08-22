@@ -52,6 +52,7 @@ deployment, monitoring, and retraining. The parts included:
   champion/challenger aliases; promotion is an alias flip, with rollback.
 - Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
 - Drift: query-length PSI plus embedding-centroid distance (a semantic signal).
+- Monitoring: Prometheus metrics with a ready Grafana dashboard (monitoring/grafana_dashboard.json) — latency p99, ungrounded ratio, drift, canary %.
 - Groundedness: a numeric guard plus a semantic content-overlap check.
 - Frontend: a React + Vite query playground (frontend/) — pick a building, ask a
   question, see the grounded answer, served-by model, and round-trip latency.

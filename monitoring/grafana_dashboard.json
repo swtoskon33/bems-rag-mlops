@@ -1,0 +1,53 @@
+{
+  "title": "bems-rag-mlops — serving & quality",
+  "schemaVersion": 39,
+  "editable": true,
+  "panels": [
+    {
+      "title": "Request rate (req/s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "rate(rag_requests_total[5m])", "legendFormat": "{{served_by}}" }
+      ]
+    },
+    {
+      "title": "p99 answer latency (s)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "histogram_quantile(0.99, rate(rag_answer_latency_seconds_bucket[5m]))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "title": "Ungrounded answer ratio",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "rate(rag_ungrounded_total[15m]) / rate(rag_requests_total[15m])", "legendFormat": "ungrounded %" }
+      ],
+      "fieldConfig": { "defaults": { "max": 1, "min": 0, "unit": "percentunit" } }
+    },
+    {
+      "title": "Query-length drift (PSI)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "rag_query_length_psi", "legendFormat": "PSI" }
+      ],
+      "thresholds": { "steps": [
+        { "color": "green", "value": null },
+        { "color": "yellow", "value": 0.1 },
+        { "color": "red", "value": 0.2 }
+      ] }
+    },
+    {
+      "title": "Canary rollout (%)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "rag_canary_percentage", "legendFormat": "challenger traffic" }
+      ]
+    }
+  ]
+}
