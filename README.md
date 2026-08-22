@@ -137,7 +137,7 @@ Choices made deliberately, and what each one trades off:
 ## Results
 
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores (25 real-building queries): hit@k 1.00, MRR 1.00, groundedness 1.00.
+Current golden-set scores (50 queries over 125 facet chunks, 25 buildings): hit@k 0.90, MRR 0.72, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
 
 ## MLflow tracking
 

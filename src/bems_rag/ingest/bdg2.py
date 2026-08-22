@@ -46,6 +46,67 @@ def _describe(row: dict[str, str]) -> str:
     return " ".join(parts)
 
 
+def _facets(row: dict[str, str]) -> list[tuple[str, str]]:
+    """Break one metadata row into per-facet (facet_name, sentence) pairs.
+
+    Multiple chunks per building means retrieval has to pick the *right* facet, not
+    just the building -- which is what makes the eval discriminative instead of a
+    guaranteed hit.
+    """
+    name = row.get("building_id", "unknown")
+    out: list[tuple[str, str]] = []
+
+    usage = row.get("primaryspaceusage")
+    if usage:
+        out.append(("usage", f"Building {name} is a {usage.lower()} facility."))
+
+    sqm = row.get("sqm")
+    if sqm:
+        out.append(("area", f"Building {name} has a floor area of {sqm} square meters."))
+
+    year = row.get("yearbuilt")
+    if year:
+        out.append(("year", f"Building {name} was built in {year.split('.')[0]}."))
+
+    eui = row.get("eui")
+    if eui:
+        out.append(("eui", f"Building {name} has an energy use intensity (EUI) of {eui}."))
+
+    present = [m for m in _METERS if (row.get(m) or "").strip().lower() == "yes"]
+    if present:
+        out.append(("energy", f"Building {name} metered energy sources: " + ", ".join(present) + "."))
+
+    return out
+
+
+def load_bdg2_facet_chunks(metadata_csv: str | Path, limit: int | None = None) -> list[Chunk]:
+    """Produce multiple facet chunks per building (area, year, eui, energy, usage).
+
+    Same tenant key (building_id) as the single-chunk loader, so retrieval stays
+    scoped per building -- but now there are several chunks to choose between.
+    """
+    chunks: list[Chunk] = []
+    with open(metadata_csv, newline="") as f:
+        reader = csv.DictReader(f)
+        for i, row in enumerate(reader):
+            if limit is not None and i >= limit:
+                break
+            bid = row.get("building_id")
+            if not bid:
+                continue
+            for facet, sentence in _facets(row):
+                chunks.append(
+                    Chunk(
+                        id=f"{bid}_{facet}",
+                        text=sentence,
+                        kind=SourceKind.DOCUMENT,
+                        building_id=bid,
+                        metadata={"facet": facet, "usage": row.get("primaryspaceusage", "")},
+                    )
+                )
+    return chunks
+
+
 def load_bdg2_chunks(metadata_csv: str | Path, limit: int | None = None) -> list[Chunk]:
     """Read metadata.csv and produce one document Chunk per building.
 
