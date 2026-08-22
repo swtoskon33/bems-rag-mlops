@@ -209,6 +209,29 @@ keeps near-exact recall by probing a subset of cells; IVF-PQ compresses vectors 
 is the methodology — the same harness scales to millions of vectors where these
 trade-offs decide the design.
 
+### HNSW parameter sweep
+
+Recall climbs with efSearch/M but plateaus below exact on these hashing embeddings —
+the honest lesson is that ANN index quality depends on the embedding manifold, not just
+parameters (full sweep + analysis in docs/hnsw_sweep.md). IVF's coarse quantisation
+beats HNSW's graph navigation here; with smooth semantic embeddings HNSW would recover.
+
+### ANN approximation -> RAG answer quality
+
+The question that actually matters: how much does approximate retrieval cost the *final
+answer*? Measured end-to-end on the golden set (docs/ann_rag_quality.md):
+
+| Index | Answer hit@4 | Drop vs exact |
+|-------|--------------|---------------|
+| Flat (exact) | 0.400 | +0.000 |
+| HNSW | 0.340 | -0.060 |
+| IVF | 0.180 | -0.220 |
+| IVF-PQ | 0.180 | -0.220 |
+
+This recall -> answer-quality transfer is the real production question: how much answer
+quality you trade for lower latency/memory. The methodology scales to millions of
+vectors where exact search is infeasible.
+
 ## MLflow tracking
 
 Real runs logged to the MLflow tracking server and registry (regenerate with `python scripts/populate_mlflow.py`).
