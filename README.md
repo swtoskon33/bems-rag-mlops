@@ -18,7 +18,7 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
 
 ```
                          RAG request path
-  Operator query ──> Retrieve ────> Generate ────> Groundedness ──> Answer
+  Operator query ──> Retrieve+Rerank ──> Generate ──> Groundedness ──> Answer
   building_id +       per-tenant    template/       numeric +        grounded=T/F
   question            FAISS         OpenAI          semantic
 
@@ -28,7 +28,7 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
   |                                                                     |
   |  Eval harness       Validation gate    MLflow registry    Serving   |
   |  hit@k MRR grnd      champion vs        versions+aliases   FastAPI   |
-  |  25 real queries     challenger; no     promote/rollback   shadow/   |
+  |  50 queries     challenger; no     promote/rollback   shadow/   |
   |                      per-bldg regress                      canary    |
   |                                                                     |
   |  Drift              Monitoring         CI/CD + Dagster   Docker      |
@@ -48,6 +48,8 @@ deployment, monitoring, and retraining. The parts included:
 - Offline evaluation: retrieval (hit@k, MRR) and generation (groundedness) on a golden
   set, logged to MLflow, written to a committed report.
 - Multi-tenant retrieval: each building searches only its own chunks.
+
+Two-stage retrieval: a bi-encoder (FAISS) fetches candidates, then a cross-encoder-style reranker rescores them. Lifts hit@1 from 0.72 to 0.90 on the golden set (see docs/retrieval_benchmark.md).
 - Versioned promotion: each RAG config is a registered MLflow model version with
   champion/challenger aliases; promotion is an alias flip, with rollback.
 - Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
@@ -143,6 +145,22 @@ Choices made deliberately, and what each one trades off:
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
 Current golden-set scores (50 queries over 125 facet chunks, 25 buildings): hit@k 0.90, MRR 0.72, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
 
+## Retrieval benchmark
+
+Two-stage retrieval (bi-encoder -> reranker) vs the bi-encoder baseline, on the golden
+set (regenerate: `python scripts/benchmark_retrieval.py`, full table in
+docs/retrieval_benchmark.md):
+
+| k | hit@k baseline | hit@k reranked | MRR baseline | MRR reranked |
+|---|----------------|----------------|--------------|--------------|
+| 1 | 0.72 | 0.90 | 0.72 | 0.90 |
+| 2 | 0.72 | 1.00 | 0.72 | 0.95 |
+| 3 | 0.90 | 1.00 | 0.78 | 0.95 |
+
+The bi-encoder finds the right building's chunks; the reranker reorders them so the
+correct *facet* surfaces first. The lexical scorer is pluggable (`RERANKER_BACKEND`) —
+a production system swaps in a cross-encoder behind the same interface.
+
 ## MLflow tracking
 
 Real runs logged to the MLflow tracking server and registry (regenerate with `python scripts/populate_mlflow.py`).
@@ -180,7 +198,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics + harness + MLflow model registry (promotion/rollback)
-    tests/             unit, data, integration (60 tests)
+    tests/             unit, data, integration (64 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -188,7 +206,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (60 tests)
+- [x] Test tiers: unit / data / integration (64 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
 - [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)

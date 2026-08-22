@@ -15,6 +15,7 @@ import faiss
 import numpy as np
 
 from bems_rag.retrieval.embeddings import Embedder, get_embedder
+from bems_rag.retrieval.reranker import Reranker, get_reranker
 from bems_rag.types import Chunk, Query, RetrievedChunk
 
 
@@ -44,8 +45,15 @@ class _TenantIndex:
 
 
 class Retriever:
-    def __init__(self, embedder: Embedder | None = None) -> None:
+    def __init__(
+        self,
+        embedder: Embedder | None = None,
+        reranker: Reranker | None = None,
+        fetch_k: int = 10,
+    ) -> None:
         self.embedder = embedder or get_embedder()
+        self.reranker = reranker or get_reranker()
+        self.fetch_k = fetch_k          # candidates to fetch before reranking
         self._by_building: dict[str, _TenantIndex] = {}
 
     def index(self, chunks: list[Chunk]) -> None:
@@ -60,9 +68,15 @@ class Retriever:
         }
 
     def retrieve(self, query: Query, k: int = 4) -> list[RetrievedChunk]:
-        """Return the top-k chunks for a query, from that building's index only."""
+        """Two-stage retrieval: fetch fetch_k candidates, then rerank down to k.
+
+        Stage 1 (recall): the bi-encoder + FAISS fetches a wider candidate set.
+        Stage 2 (precision): the reranker rescores (query, chunk) pairs and keeps k.
+        With the default identity reranker this is equivalent to plain top-k.
+        """
         tenant = self._by_building.get(query.building_id)
         if tenant is None:
             return []  # unknown building -> no context (never leak other tenants)
         qv = _as_faiss(self.embedder.embed([query.text]))
-        return tenant.search(qv, k)
+        candidates = tenant.search(qv, max(self.fetch_k, k))
+        return self.reranker.rerank(query, candidates, k)
