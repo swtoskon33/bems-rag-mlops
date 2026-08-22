@@ -8,6 +8,7 @@ license = { text = "MIT" }
 authors = [{ name = "Sotirios Konstantakos" }]
 
 dependencies = [
+    "rank-bm25>=0.2",
     "fastapi>=0.110",
     "uvicorn>=0.29",
     "pydantic>=2.6",

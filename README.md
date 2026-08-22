@@ -18,7 +18,7 @@ ASHRAE GEPIII competition): https://github.com/buds-lab/building-data-genome-pro
 
 ```
                          RAG request path
-  Operator query ──> Retrieve+Rerank ──> Generate ──> Groundedness ──> Answer
+  Operator query ──> Hybrid+Rerank ──> Generate ──> Groundedness ──> Answer
   building_id +       per-tenant    template/       numeric +        grounded=T/F
   question            FAISS         OpenAI          semantic
 
@@ -48,6 +48,8 @@ deployment, monitoring, and retraining. The parts included:
 - Offline evaluation: retrieval (hit@k, MRR) and generation (groundedness) on a golden
   set, logged to MLflow, written to a committed report.
 - Multi-tenant retrieval: each building searches only its own chunks.
+
+Hybrid retrieval: sparse BM25 + dense FAISS fused with Reciprocal Rank Fusion, then reranked — full ablation in docs/retrieval_ablation.md.
 
 ANN benchmark: Flat vs HNSW vs IVF vs IVF-PQ with Recall@10 / latency / memory (see docs/ann_benchmark.md) — the vector-search trade-off, connected to my ANN research.
 
@@ -162,6 +164,22 @@ docs/retrieval_benchmark.md):
 The bi-encoder finds the right building's chunks; the reranker reorders them so the
 correct *facet* surfaces first. The lexical scorer is pluggable (`RERANKER_BACKEND`) —
 a production system swaps in a cross-encoder behind the same interface.
+
+## Retrieval ablation
+
+Each retrieval component's contribution on the golden set (regenerate:
+`python scripts/benchmark_ablation.py`, full table in docs/retrieval_ablation.md):
+
+| Config | hit@1 | hit@3 |
+|--------|-------|-------|
+| Dense only | 0.72 | 0.90 |
+| BM25 only | 0.60 | 0.80 |
+| Hybrid (RRF) | 0.72 | 0.80 |
+| Hybrid + reranker | 0.90 | 1.00 |
+
+Dense captures paraphrased semantics; BM25 captures exact terms (equipment ids, units);
+RRF fusion combines both; the reranker reorders the fused set so the right facet surfaces
+first. Each stage's value is measured, not assumed.
 
 ## ANN index benchmark
 

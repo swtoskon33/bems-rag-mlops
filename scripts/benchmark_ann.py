@@ -103,13 +103,16 @@ def main() -> None:
     results.append(_bench(ivfpq, queries, exact_ids, "IVF-PQ (m=8)", time.perf_counter() - t))
 
     # Write report
+    intro = (
+        f"FAISS index types over {n} building-facet embeddings (dim {d}), "
+        f"{len(queries)} queries, K={K}. Flat is exact (recall 1.0 by definition); "
+        "approximate indexes trade recall for latency and/or memory. Deterministic "
+        "offline embedder, so numbers are reproducible."
+    )
     lines = [
         "# ANN index benchmark",
         "",
-        f"FAISS index types over {n} building-facet embeddings (dim {d}), {len(queries)} "
-        f"queries, K={K}. Flat is exact (recall 1.0 by definition); approximate indexes "
-        "trade recall for latency and/or memory. Deterministic offline embedder, so "
-        "numbers are reproducible.",
+        intro,
         "",
         "| Index | Recall@10 | p50 (ms) | p95 (ms) | Memory (KB) | Build (ms) |",
         "|-------|-----------|----------|----------|-------------|------------|",
@@ -119,14 +122,15 @@ def main() -> None:
             f"| {r['name']} | {r['recall']:.3f} | {r['p50']:.3f} | {r['p95']:.3f} "
             f"| {r['mem_kb']:.0f} | {r['build_ms']:.1f} |"
         )
-    lines += [
-        "",
+    note = (
         "Reading the trade-off: HNSW keeps recall near-exact at low latency but costs "
-        "memory; IVF cuts search cost by probing fewer cells (recall depends on nprobe); "
-        "IVF-PQ compresses vectors hard (much lower memory) at some recall cost. At this "
-        "corpus size Flat is already fast, so the point is the methodology \u2014 the same "
-        "harness scales to millions of vectors where the trade-offs bite.",
-    ]
+        "memory; IVF cuts search cost by probing fewer cells (recall depends on "
+        "nprobe); IVF-PQ compresses vectors hard (much lower memory) at some recall "
+        "cost. At this corpus size Flat is already fast, so the point is the "
+        "methodology - the same harness scales to millions of vectors where the "
+        "trade-offs bite."
+    )
+    lines += ["", note]
     OUT.write_text("\n".join(lines) + "\n")
     print(f"wrote {OUT}")
     for line in lines[5:11]:
