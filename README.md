@@ -167,6 +167,13 @@ a production system swaps in a cross-encoder behind the same interface.
 
 ## Retrieval ablation
 
+Two-stage retrieval pipeline:
+
+Query ──> BM25 (sparse) ──┐
+├──> RRF fusion ──> Reranker ──> Top-K
+Query ──> Dense (FAISS) ──┘
+
+
 Each retrieval component's contribution on the golden set (regenerate:
 `python scripts/benchmark_ablation.py`, full table in docs/retrieval_ablation.md):
 
