@@ -49,6 +49,8 @@ deployment, monitoring, and retraining. The parts included:
   set, logged to MLflow, written to a committed report.
 - Multi-tenant retrieval: each building searches only its own chunks.
 
+ANN benchmark: Flat vs HNSW vs IVF vs IVF-PQ with Recall@10 / latency / memory (see docs/ann_benchmark.md) — the vector-search trade-off, connected to my ANN research.
+
 Two-stage retrieval: a bi-encoder (FAISS) fetches candidates, then a cross-encoder-style reranker rescores them. Lifts hit@1 from 0.72 to 0.90 on the golden set (see docs/retrieval_benchmark.md).
 - Versioned promotion: each RAG config is a registered MLflow model version with
   champion/challenger aliases; promotion is an alias flip, with rollback.
@@ -160,6 +162,25 @@ docs/retrieval_benchmark.md):
 The bi-encoder finds the right building's chunks; the reranker reorders them so the
 correct *facet* surfaces first. The lexical scorer is pluggable (`RERANKER_BACKEND`) —
 a production system swaps in a cross-encoder behind the same interface.
+
+## ANN index benchmark
+
+FAISS index types over the building embeddings, showing the recall / latency / memory
+trade-off that governs vector search at scale (regenerate:
+`python scripts/benchmark_ann.py`, full table in docs/ann_benchmark.md):
+
+| Index | Recall@10 | p50 (ms) | Memory (KB) |
+|-------|-----------|----------|-------------|
+| Flat (exact) | 1.000 | 0.021 | 919 |
+| HNSW (M=16) | 0.679 | 0.016 | 1048 |
+| IVF (nlist=16, nprobe=8) | 0.973 | 0.016 | 942 |
+| IVF-PQ (m=8) | 0.393 | 0.012 | 43 |
+
+Flat is exact; the approximate indexes trade recall for latency and/or memory. IVF
+keeps near-exact recall by probing a subset of cells; IVF-PQ compresses vectors ~21x
+(919 -> 43 KB) at a recall cost. At this corpus size Flat is already fast, so the value
+is the methodology — the same harness scales to millions of vectors where these
+trade-offs decide the design.
 
 ## MLflow tracking
 
