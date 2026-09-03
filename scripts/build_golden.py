@@ -56,7 +56,8 @@ def main(n_buildings: int = 25) -> None:
         ("what is the energy use intensity?", "eui"),
         ("what type of facility is this?", "usage"),
     ]
-    PARAPHRASED = [
+    # Dev paraphrases: the reranker's synonym map was tuned against these.
+    PARAPHRASED_DEV = [
         ("how big is this place in square metres?", "area"),
         ("how old is the property?", "year"),
         ("which utilities feed the site?", "energy"),
@@ -64,12 +65,28 @@ def main(n_buildings: int = 25) -> None:
         ("what is this premises used for?", "usage"),
     ]
 
+    # Held-out paraphrases: written after the synonym map was frozen, using wording it
+    # has never seen. These are what the reported reranker numbers should be read from --
+    # scoring on the dev set alone would measure the hand-written mapping, not reranking.
+    PARAPHRASED_HELDOUT = [
+        ("what is the footprint of this structure?", "area"),
+        ("when did construction finish?", "year"),
+        ("what powers this location?", "energy"),
+        ("how much power does it draw per square metre?", "eui"),
+        ("what goes on inside this place?", "usage"),
+    ]
+
     queries = []
+    banks = (
+        (DIRECT, "direct"),
+        (PARAPHRASED_DEV, "paraphrased_dev"),
+        (PARAPHRASED_HELDOUT, "paraphrased_heldout"),
+    )
     for i, (bid, facets) in enumerate(by_building.items()):
-        for bank, difficulty in ((DIRECT, "direct"), (PARAPHRASED, "paraphrased")):
+        for bank, difficulty in banks:
             text, facet = bank[i % len(bank)]
             if facet not in facets:
-                continue  # building lacks that facet; skip
+                continue
             queries.append({
                 "text": text,
                 "building_id": bid,

@@ -53,7 +53,7 @@ Hybrid retrieval: sparse BM25 + dense FAISS fused with Reciprocal Rank Fusion, t
 
 ANN benchmark: Flat vs HNSW vs IVF vs IVF-PQ with Recall@10 / latency / memory (see docs/ann_benchmark.md) — the vector-search trade-off, connected to my ANN research.
 
-Two-stage retrieval: a bi-encoder (FAISS) fetches candidates, then a cross-encoder-style reranker rescores them. Lifts hit@1 from 0.72 to 0.90 on the golden set (see docs/retrieval_benchmark.md).
+Two-stage retrieval: a bi-encoder fetches candidates, then a reranker rescores them. Measured on held-out paraphrases the lexical reranker *hurts* retrieval (hit@1 0.36 -> 0.16); it only helps on the wording its synonym map was written against. Documented in docs/retrieval_benchmark.md as the case for a cross-encoder.
 - Versioned promotion: each RAG config is a registered MLflow model version with
   champion/challenger aliases; promotion is an alias flip, with rollback.
 - Automated CD: a workflow runs eval -> validation gate -> promote after CI passes.
@@ -151,19 +151,25 @@ Current golden-set scores (50 queries over 125 facet chunks, 25 buildings): hit@
 
 ## Retrieval benchmark
 
-Two-stage retrieval (bi-encoder -> reranker) vs the bi-encoder baseline, on the golden
-set (regenerate: `python scripts/benchmark_retrieval.py`, full table in
+Baseline retrieval against two-stage retrieve->rerank, split by query group
+(regenerate: `python scripts/benchmark_retrieval.py`, full table in
 docs/retrieval_benchmark.md):
 
-| k | hit@k baseline | hit@k reranked | MRR baseline | MRR reranked |
-|---|----------------|----------------|--------------|--------------|
-| 1 | 0.72 | 0.90 | 0.72 | 0.90 |
-| 2 | 0.72 | 1.00 | 0.72 | 0.95 |
-| 3 | 0.90 | 1.00 | 0.78 | 0.95 |
+| Query group | hit@1 baseline | hit@1 reranked | Change |
+|-------------|----------------|----------------|--------|
+| direct | 1.00 | 1.00 | - |
+| paraphrased, dev | 0.44 | 0.80 | +0.36 |
+| paraphrased, held-out | 0.36 | 0.16 | -0.20 |
 
-The bi-encoder finds the right building's chunks; the reranker reorders them so the
-correct *facet* surfaces first. The lexical scorer is pluggable (`RERANKER_BACKEND`) —
-a production system swaps in a cross-encoder behind the same interface.
+The split matters more than the numbers. The reranker's synonym map was written
+while looking at the dev paraphrases, so the +0.36 there measures a hand-written
+mapping from those queries to the corpus vocabulary. On held-out paraphrases,
+worded after the map was frozen, the same reranker makes retrieval *worse*: a
+lookup table cannot generalise, and here it does not degrade gracefully either.
+
+That is the argument for a cross-encoder, which scores a (query, passage) pair on
+its own merits rather than on whether the words match a list. It is also why the
+reranker ships off by default (`RERANKER_BACKEND=none`).
 
 ## Retrieval ablation
 
@@ -179,12 +185,12 @@ Query ──> Dense (FAISS) ──┘
 Each retrieval component's contribution on the golden set (regenerate:
 `python scripts/benchmark_ablation.py`, full table in docs/retrieval_ablation.md):
 
-| Config | hit@1 | hit@3 |
-|--------|-------|-------|
-| Dense only | 0.72 | 0.90 |
-| BM25 only | 0.60 | 0.80 |
-| Hybrid (RRF) | 0.72 | 0.80 |
-| Hybrid + reranker | 0.90 | 1.00 |
+| Config | hit@1 | hit@3 | note |
+|--------|-------|-------|------|
+| Dense only | 0.72 | 0.90 | |
+| BM25 only | 0.60 | 0.80 | |
+| Hybrid (RRF) | 0.72 | 0.80 | |
+| Hybrid + reranker | 0.90 | 1.00 | (dev paraphrases; see the benchmark above) |
 
 Dense captures paraphrased semantics; BM25 captures exact terms (equipment ids, units);
 RRF fusion combines both; the reranker reorders the fused set so the right facet surfaces
@@ -269,7 +275,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics + harness + MLflow model registry (promotion/rollback)
-    tests/             unit, data, integration (67 tests)
+    tests/             unit, data, integration (69 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -277,7 +283,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (67 tests)
+- [x] Test tiers: unit / data / integration (69 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
 - [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)
