@@ -147,7 +147,7 @@ Choices made deliberately, and what each one trades off:
 ## Results
 
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores (75 queries over 125 facet chunks, 25 buildings; direct plus dev and held-out paraphrases): hit@k 0.90, MRR 0.78, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
+Current golden-set scores (75 queries over 125 facet chunks, 25 buildings, MiniLM embeddings): hit@k 1.00, MRR 0.93, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
 
 ## Embedding benchmark
 
@@ -157,9 +157,9 @@ full table in docs/embedding_benchmark.md):
 
 | Embedder | Reranker | direct | paraphrased (dev) | paraphrased (held-out) |
 |----------|----------|--------|-------------------|------------------------|
-| hashing | none | 1.00 | 0.44 | 0.36 |
+| hashing (CI fallback) | none | 1.00 | 0.44 | 0.36 |
 | hashing | lexical | 1.00 | 0.80 | 0.16 |
-| MiniLM | none | 1.00 | 1.00 | 0.64 |
+| MiniLM (default for published numbers) | none | 1.00 | 1.00 | 0.64 |
 | MiniLM | lexical | 1.00 | 1.00 | 0.64 |
 
 A real embedder nearly doubles held-out paraphrase retrieval (0.36 to 0.64): it places
@@ -170,6 +170,9 @@ fix for paraphrases was a better embedder, not a hand-written mapping.
 
 Hashing stays the CI default because the model is a download; the semantic path is an
 optional extra (`pip install -e ".[semantic]"`, `EMBEDDING_BACKEND=minilm`).
+
+
+**All benchmark numbers in this README come from MiniLM embeddings.** The hashing embedder remains the zero-dependency fallback so the test suite runs in CI without a model download, but it is not the configuration the results describe. Regenerate with `KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_*.py`.
 
 ## Retrieval benchmark
 
@@ -209,10 +212,10 @@ Each retrieval component's contribution on the golden set (regenerate:
 
 | Config | hit@1 | hit@3 | note |
 |--------|-------|-------|------|
-| Dense only | 0.72 | 0.90 | |
-| BM25 only | 0.60 | 0.80 | |
-| Hybrid (RRF) | 0.72 | 0.80 | |
-| Hybrid + reranker | 0.90 | 1.00 | (dev paraphrases; see the benchmark above) |
+| Dense only | 0.88 | 1.00 | |
+| BM25 only | 0.47 | 0.73 | |
+| Hybrid (RRF) | 0.69 | 0.91 | |
+| Hybrid + reranker | 0.80 | 0.96 | (dev paraphrases; see the benchmark above) |
 
 Dense captures paraphrased semantics; BM25 captures exact terms (equipment ids, units);
 RRF fusion combines both; the reranker reorders the fused set so the right facet surfaces
@@ -226,10 +229,10 @@ trade-off that governs vector search at scale (regenerate:
 
 | Index | Recall@10 | p50 (ms) | Memory (KB) |
 |-------|-----------|----------|-------------|
-| Flat (exact) | 1.000 | 0.021 | 919 |
-| HNSW (M=16) | 0.679 | 0.016 | 1048 |
-| IVF (nlist=16, nprobe=8) | 0.973 | 0.016 | 942 |
-| IVF-PQ (m=8) | 0.393 | 0.012 | 43 |
+| Flat (exact) | 1.000 | 0.030 | 1379 |
+| HNSW (M=16) | 0.998 | 0.023 | 1508 |
+| IVF (nlist=16, nprobe=8) | 0.998 | 0.019 | 1410 |
+| IVF-PQ (m=8) | 0.621 | 0.013 | 59 |
 
 Flat is exact; the approximate indexes trade recall for latency and/or memory. IVF
 keeps near-exact recall by probing a subset of cells; IVF-PQ compresses vectors ~21x

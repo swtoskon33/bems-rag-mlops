@@ -8,6 +8,7 @@ recall climbs toward exact as efSearch grows, at a latency cost.
 """
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
@@ -22,6 +23,8 @@ K = 10
 
 
 def main() -> None:
+    # semantic embeddings are the production path; hashing is the CI fallback
+    os.environ.setdefault("EMBEDDING_BACKEND", "minilm")
     chunks = load_bdg2_facet_chunks("data/bdg2/metadata.csv", limit=200)
     emb = get_embedder()
     vecs = np.ascontiguousarray(emb.embed([c.text for c in chunks]), dtype=np.float32)

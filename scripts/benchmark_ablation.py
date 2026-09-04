@@ -8,6 +8,7 @@ is justified by evidence rather than assertion.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from bems_rag.ingest.bdg2 import load_bdg2_facet_chunks
@@ -43,6 +44,8 @@ def _metrics(get_results, queries, k):
 
 
 def main() -> None:
+    # semantic embeddings are the production path; hashing is the CI fallback
+    os.environ.setdefault("EMBEDDING_BACKEND", "minilm")
     chunks, queries = _load()
     Q = lambda q: Query(text=q["text"], building_id=q["building_id"])
 
@@ -77,9 +80,14 @@ def main() -> None:
         lines.append(f"| {name} | {h1:.2f} | {m1:.2f} | {h3:.2f} | {m3:.2f} |")
 
     note = (
-        "Dense captures paraphrased semantics; BM25 captures exact terms; RRF fusion "
-        "gets the best of both; the reranker then reorders the fused set so the correct "
-        "facet surfaces first. Each stage adds measurable value."
+        "With semantic embeddings the ordering inverts from the earlier hashing-embedder "
+        "run. Dense retrieval alone is now the strongest configuration; adding BM25 "
+        "through RRF makes it worse (0.88 to 0.69 hit@1), because fusing a weak lexical "
+        "ranker into a strong semantic one dilutes it. The reranker recovers part of that "
+        "loss but does not reach dense alone. Hybrid retrieval earns its place when both "
+        "arms are comparably good, which was true of two lexical arms and is not true "
+        "here -- the honest conclusion is to serve dense and keep BM25 for exact-term "
+        "queries rather than fusing it in by default."
     )
     lines += ["", note]
     OUT.write_text("\n".join(lines) + "\n")

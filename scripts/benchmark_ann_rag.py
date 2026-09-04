@@ -10,6 +10,7 @@ just raw index recall. Shows the recall -> answer-quality transfer.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import faiss
@@ -44,6 +45,8 @@ def _build(index_kind, vecs, d):
 
 
 def main() -> None:
+    # semantic embeddings are the production path; hashing is the CI fallback
+    os.environ.setdefault("EMBEDDING_BACKEND", "minilm")
     # Group the corpus into a single global index per index-type, but evaluate the
     # golden queries which are answerable from a specific chunk. To make approximation
     # visible without drowning the signal in 900 noisy vectors, we retrieve a larger

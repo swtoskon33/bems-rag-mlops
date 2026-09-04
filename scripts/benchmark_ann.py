@@ -12,6 +12,7 @@ reproducible without any model download.
 """
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
@@ -62,6 +63,8 @@ def _bench(index, queries, exact_ids, name, build_time):
 
 
 def main() -> None:
+    # semantic embeddings are the production path; hashing is the CI fallback
+    os.environ.setdefault("EMBEDDING_BACKEND", "minilm")
     vecs, _ = _vectors()
     n, d = vecs.shape
     rng = np.random.default_rng(0)
