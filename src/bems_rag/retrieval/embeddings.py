@@ -65,9 +65,40 @@ class OpenAIEmbedder:
         return np.array([d.embedding for d in resp.data], dtype=np.float32)
 
 
+class SentenceTransformerEmbedder:
+    """Real semantic embeddings from a sentence-transformers model.
+
+    The hashing embedder is a bag of hashed tokens: two ways of saying the same thing
+    share no dimensions unless they share words. This one places paraphrases near each
+    other, which is what the paraphrased half of the golden set actually tests.
+
+    Optional: the model is a download, so it stays out of the CI path. Install with
+    `pip install -e ".[semantic]"` and select with EMBEDDING_BACKEND=minilm.
+    """
+
+    def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2") -> None:
+        from sentence_transformers import SentenceTransformer
+
+        self.model = SentenceTransformer(model_name)
+        self.model_name = model_name
+        getter = getattr(self.model, "get_embedding_dimension", None) or self.model.get_sentence_embedding_dimension
+        self._dim = int(getter())
+
+    @property
+    def dim(self) -> int:
+        return self._dim
+
+    def embed(self, texts: list[str]) -> np.ndarray:
+        vectors = self.model.encode(texts, normalize_embeddings=True,
+                                    show_progress_bar=False)
+        return np.asarray(vectors, dtype=np.float32)
+
+
 def get_embedder() -> Embedder:
     """Factory: pick the backend from EMBEDDING_BACKEND (default: hashing)."""
     backend = os.getenv("EMBEDDING_BACKEND", "hashing").lower()
+    if backend in ("minilm", "sentence-transformers"):
+        return SentenceTransformerEmbedder()
     if backend == "openai":
         return OpenAIEmbedder()
     return HashingEmbedder()

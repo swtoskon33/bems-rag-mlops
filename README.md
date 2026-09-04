@@ -147,7 +147,29 @@ Choices made deliberately, and what each one trades off:
 ## Results
 
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores (50 queries over 125 facet chunks, 25 buildings): hit@k 0.90, MRR 0.78, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
+Current golden-set scores (75 queries over 125 facet chunks, 25 buildings; direct plus dev and held-out paraphrases): hit@k 0.90, MRR 0.78, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
+
+## Embedding benchmark
+
+Every other number here comes from the offline hashing embedder. This is what changes
+with a real semantic model (`KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_embeddings.py`,
+full table in docs/embedding_benchmark.md):
+
+| Embedder | Reranker | direct | paraphrased (dev) | paraphrased (held-out) |
+|----------|----------|--------|-------------------|------------------------|
+| hashing | none | 1.00 | 0.44 | 0.36 |
+| hashing | lexical | 1.00 | 0.80 | 0.16 |
+| MiniLM | none | 1.00 | 1.00 | 0.64 |
+| MiniLM | lexical | 1.00 | 1.00 | 0.64 |
+
+A real embedder nearly doubles held-out paraphrase retrieval (0.36 to 0.64): it places
+rewordings near each other in vector space, which a bag of hashed tokens structurally
+cannot do. And once retrieval is semantic the lexical reranker adds nothing at all — its
+earlier apparent value was a synonym table compensating for a weak retriever. The right
+fix for paraphrases was a better embedder, not a hand-written mapping.
+
+Hashing stays the CI default because the model is a download; the semantic path is an
+optional extra (`pip install -e ".[semantic]"`, `EMBEDDING_BACKEND=minilm`).
 
 ## Retrieval benchmark
 
