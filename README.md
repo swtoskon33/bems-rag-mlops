@@ -146,13 +146,22 @@ Choices made deliberately, and what each one trades off:
 
 ## Results
 
-See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores (75 queries over 125 facet chunks, 25 buildings, MiniLM embeddings): hit@k 1.00, MRR 0.93, groundedness 1.00. The golden set covers five groups: direct questions, paraphrases the reranker was tuned against, held-out paraphrases, multi-facet questions needing two chunks, and out-of-scope questions the system should decline. That last group is what caught the abstention gap: before the relevance floor, the system answered 25 out of 25 unanswerable questions with grounded=True.
+See docs/eval_report.md (regenerate: `KMP_DUPLICATE_LIB_OK=TRUE EMBEDDING_BACKEND=minilm python scripts/run_eval.py`).
+Current golden-set scores (125 queries over 125 facet chunks, 25 real buildings, MiniLM embeddings), by group:
+
+| Group | n | hit@4 | MRR | recall |
+|-------|---|-------|-----|--------|
+| direct | 25 | 1.00 | 1.00 | 1.00 |
+| paraphrased (dev) | 25 | 0.80 | 0.80 | 0.80 |
+| paraphrased (held-out) | 25 | 0.96 | 0.75 | 0.96 |
+| multi-facet | 25 | 1.00 | 1.00 | 1.00 |
+
+Out-of-scope questions are scored separately: 15 of 25 declined. Those exist because a saturated eval cannot discriminate, and they immediately earned their place. Before the relevance floor the system answered all 25 unanswerable questions with grounded=True, since groundedness only checks that the answer's figures come from the retrieved context and the template answer quotes that context verbatim. Full breakdown in docs/eval_report.md.
 
 ## Embedding benchmark
 
-Every other number here comes from the offline hashing embedder. This is what changes
-with a real semantic model (`KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_embeddings.py`,
+What the embedder itself is worth, measured by swapping it out. The hashing embedder
+is the CI fallback; every published figure above uses MiniLM (`KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_embeddings.py`,
 full table in docs/embedding_benchmark.md):
 
 | Embedder | Reranker | direct | paraphrased (dev) | paraphrased (held-out) |
