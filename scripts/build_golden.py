@@ -76,6 +76,25 @@ def main(n_buildings: int = 25) -> None:
         ("what goes on inside this place?", "usage"),
     ]
 
+    # Multi-facet: one question whose answer needs two chunks. A retriever that returns
+    # only one of them is half right, which hit@1 alone cannot express.
+    MULTI_FACET = [
+        ("how big is it and when was it built?", ["area", "year"]),
+        ("what is its energy intensity and which sources does it meter?", ["eui", "energy"]),
+        ("what type of building is it and how large?", ["usage", "area"]),
+    ]
+
+    # Out of scope: the corpus holds no answer. The correct behaviour is to retrieve
+    # nothing relevant and, downstream, to abstain. Scored separately -- a system that
+    # confidently answers these is worse than one that returns nothing.
+    OUT_OF_SCOPE = [
+        "who is the facility manager?",
+        "what is the maintenance budget for next year?",
+        "when was the last fire inspection?",
+        "how many parking spaces does it have?",
+        "what is the lease expiry date?",
+    ]
+
     queries = []
     banks = (
         (DIRECT, "direct"),
@@ -93,6 +112,24 @@ def main(n_buildings: int = 25) -> None:
                 "relevant_ids": [facets[facet]],
                 "difficulty": difficulty,
             })
+
+    # multi-facet questions carry several relevant ids
+    for i, (bid, facets) in enumerate(by_building.items()):
+        text, wanted = MULTI_FACET[i % len(MULTI_FACET)]
+        ids = [facets[f] for f in wanted if f in facets]
+        if len(ids) == len(wanted):
+            queries.append({
+                "text": text, "building_id": bid, "relevant_ids": ids,
+                "difficulty": "multi_facet",
+            })
+
+    # out-of-scope questions have no relevant chunk at all
+    for i, (bid, _facets) in enumerate(by_building.items()):
+        queries.append({
+            "text": OUT_OF_SCOPE[i % len(OUT_OF_SCOPE)],
+            "building_id": bid, "relevant_ids": [],
+            "difficulty": "out_of_scope",
+        })
 
     OUT.write_text(json.dumps({"chunks": golden_chunks, "queries": queries}, indent=2))
     print(f"wrote {OUT}: {len(golden_chunks)} chunks, {len(queries)} queries")

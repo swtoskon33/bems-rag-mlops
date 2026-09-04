@@ -1,16 +1,14 @@
-# RAG Evaluation Report
+# Evaluation report
 
-_Last run: 2026-09-04 05:14 UTC_
+Golden set: 125 queries over 125 facet chunks from 25 real BDG2 buildings, in five groups. Direct and paraphrased questions have one answer; multi-facet questions need two chunks, so recall matters more than hit@k; out-of-scope questions have no answer in the corpus at all, and the only correct behaviour is to decline.
 
-Offline evaluation of the retrieval + generation pipeline on the golden query set.
-Regenerate with `python scripts/run_eval.py`.
+| Query group | n | hit@4 | MRR | recall |
+|-------------|---|-------|-----|--------|
+| direct | 25 | 1.00 | 1.00 | 1.00 |
+| paraphrased_dev | 25 | 0.80 | 0.80 | 0.80 |
+| paraphrased_heldout | 25 | 0.96 | 0.75 | 0.96 |
+| multi_facet | 25 | 1.00 | 1.00 | 1.00 |
 
-| Metric | Value | What it measures |
-|---|---|---|
-| hit@k | 1.000 | fraction of queries whose relevant chunk is in the top-k |
-| MRR | 0.931 | mean reciprocal rank of the first relevant chunk |
-| groundedness | 1.000 | fraction of answers with every number traceable to context |
-| queries | 75 | size of the golden evaluation set |
+**Out of scope:** 15/25 declined (0.60). These have no answer in the corpus, so a confident response is a failure and an abstention is the correct result.
 
-Metrics are also logged to MLflow (`mlflow ui` to browse run history and compare
-champion vs challenger).
+Regenerate with `KMP_DUPLICATE_LIB_OK=TRUE EMBEDDING_BACKEND=minilm python scripts/run_eval.py`.

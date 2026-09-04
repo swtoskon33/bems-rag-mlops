@@ -37,6 +37,29 @@ class Generator(Protocol):
         ...
 
 
+
+# Chosen from the score distributions on the golden set, not by taste. In-scope
+# questions score min 0.21 / median 0.45; out-of-scope ones median 0.23 / max 0.41. The
+# ranges overlap, so no threshold separates them cleanly: 0.25 keeps 94% of answerable
+# questions while declining 60% of unanswerable ones, and moving it either way trades one
+# against the other. Regenerate the distributions with scripts/tune_relevance_floor.py.
+_RELEVANCE_FLOOR = 0.25
+
+
+def _is_relevant(query: Query, contexts: list[RetrievedChunk]) -> bool:
+    """Does the best retrieved chunk actually bear on the question?
+
+    Retrieval always returns its top-k, even when the corpus holds nothing relevant:
+    asked who the facility manager is, it hands back whatever chunk sits closest, and the
+    numeric groundedness check passes because the answer quotes that chunk verbatim.
+    Groundedness asks whether the answer follows from the context; it cannot tell whether
+    the context answers the question. This does, imperfectly -- see the note on the floor.
+    """
+    if not contexts:
+        return False
+    return contexts[0].score >= _RELEVANCE_FLOOR
+
+
 class TemplateGenerator:
     """Deterministic, offline generator: stitches an answer from the top contexts.
 
@@ -50,6 +73,12 @@ class TemplateGenerator:
                 text="I don't have enough context to answer that for this building.",
                 contexts=[],
                 grounded=True,
+            )
+        if not _is_relevant(query, contexts):
+            return Answer(
+                text="I don't have enough context to answer that for this building.",
+                contexts=[],
+                grounded=False,
             )
         top = contexts[0].chunk.text
         text = f"Based on the available data: {top}"

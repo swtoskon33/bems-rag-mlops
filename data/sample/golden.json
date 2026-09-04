@@ -1351,6 +1351,381 @@
         "Panther_education_Karri_usage"
       ],
       "difficulty": "paraphrased_heldout"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_lodging_Dean",
+      "relevant_ids": [
+        "Panther_lodging_Dean_area",
+        "Panther_lodging_Dean_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_lodging_Shelia",
+      "relevant_ids": [
+        "Panther_lodging_Shelia_eui",
+        "Panther_lodging_Shelia_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_lodging_Ricky",
+      "relevant_ids": [
+        "Panther_lodging_Ricky_usage",
+        "Panther_lodging_Ricky_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Rosalie",
+      "relevant_ids": [
+        "Panther_education_Rosalie_area",
+        "Panther_education_Rosalie_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_education_Misty",
+      "relevant_ids": [
+        "Panther_education_Misty_eui",
+        "Panther_education_Misty_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_office_Daina",
+      "relevant_ids": [
+        "Panther_office_Daina_usage",
+        "Panther_office_Daina_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Mattie",
+      "relevant_ids": [
+        "Panther_education_Mattie_area",
+        "Panther_education_Mattie_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_office_Woodrow",
+      "relevant_ids": [
+        "Panther_office_Woodrow_eui",
+        "Panther_office_Woodrow_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_education_Diann",
+      "relevant_ids": [
+        "Panther_education_Diann_usage",
+        "Panther_education_Diann_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Gina",
+      "relevant_ids": [
+        "Panther_education_Gina_area",
+        "Panther_education_Gina_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_education_Tina",
+      "relevant_ids": [
+        "Panther_education_Tina_eui",
+        "Panther_education_Tina_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_lodging_Russell",
+      "relevant_ids": [
+        "Panther_lodging_Russell_usage",
+        "Panther_lodging_Russell_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Guillermina",
+      "relevant_ids": [
+        "Panther_education_Guillermina_area",
+        "Panther_education_Guillermina_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_lodging_Amos",
+      "relevant_ids": [
+        "Panther_lodging_Amos_eui",
+        "Panther_lodging_Amos_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_education_Vincent",
+      "relevant_ids": [
+        "Panther_education_Vincent_usage",
+        "Panther_education_Vincent_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Shelton",
+      "relevant_ids": [
+        "Panther_education_Shelton_area",
+        "Panther_education_Shelton_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_office_Karla",
+      "relevant_ids": [
+        "Panther_office_Karla_eui",
+        "Panther_office_Karla_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_assembly_Denice",
+      "relevant_ids": [
+        "Panther_assembly_Denice_usage",
+        "Panther_assembly_Denice_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Sophia",
+      "relevant_ids": [
+        "Panther_education_Sophia_area",
+        "Panther_education_Sophia_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_lodging_Bonnie",
+      "relevant_ids": [
+        "Panther_lodging_Bonnie_eui",
+        "Panther_lodging_Bonnie_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_lodging_Willa",
+      "relevant_ids": [
+        "Panther_lodging_Willa_usage",
+        "Panther_lodging_Willa_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Annetta",
+      "relevant_ids": [
+        "Panther_education_Annetta_area",
+        "Panther_education_Annetta_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what is its energy intensity and which sources does it meter?",
+      "building_id": "Panther_education_Aurora",
+      "relevant_ids": [
+        "Panther_education_Aurora_eui",
+        "Panther_education_Aurora_energy"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "what type of building is it and how large?",
+      "building_id": "Panther_office_Graham",
+      "relevant_ids": [
+        "Panther_office_Graham_usage",
+        "Panther_office_Graham_area"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "how big is it and when was it built?",
+      "building_id": "Panther_education_Karri",
+      "relevant_ids": [
+        "Panther_education_Karri_area",
+        "Panther_education_Karri_year"
+      ],
+      "difficulty": "multi_facet"
+    },
+    {
+      "text": "who is the facility manager?",
+      "building_id": "Panther_lodging_Dean",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the maintenance budget for next year?",
+      "building_id": "Panther_lodging_Shelia",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "when was the last fire inspection?",
+      "building_id": "Panther_lodging_Ricky",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "how many parking spaces does it have?",
+      "building_id": "Panther_education_Rosalie",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the lease expiry date?",
+      "building_id": "Panther_education_Misty",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "who is the facility manager?",
+      "building_id": "Panther_office_Daina",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the maintenance budget for next year?",
+      "building_id": "Panther_education_Mattie",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "when was the last fire inspection?",
+      "building_id": "Panther_office_Woodrow",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "how many parking spaces does it have?",
+      "building_id": "Panther_education_Diann",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the lease expiry date?",
+      "building_id": "Panther_education_Gina",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "who is the facility manager?",
+      "building_id": "Panther_education_Tina",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the maintenance budget for next year?",
+      "building_id": "Panther_lodging_Russell",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "when was the last fire inspection?",
+      "building_id": "Panther_education_Guillermina",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "how many parking spaces does it have?",
+      "building_id": "Panther_lodging_Amos",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the lease expiry date?",
+      "building_id": "Panther_education_Vincent",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "who is the facility manager?",
+      "building_id": "Panther_education_Shelton",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the maintenance budget for next year?",
+      "building_id": "Panther_office_Karla",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "when was the last fire inspection?",
+      "building_id": "Panther_assembly_Denice",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "how many parking spaces does it have?",
+      "building_id": "Panther_education_Sophia",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the lease expiry date?",
+      "building_id": "Panther_lodging_Bonnie",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "who is the facility manager?",
+      "building_id": "Panther_lodging_Willa",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the maintenance budget for next year?",
+      "building_id": "Panther_education_Annetta",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "when was the last fire inspection?",
+      "building_id": "Panther_education_Aurora",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "how many parking spaces does it have?",
+      "building_id": "Panther_office_Graham",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
+    },
+    {
+      "text": "what is the lease expiry date?",
+      "building_id": "Panther_education_Karri",
+      "relevant_ids": [],
+      "difficulty": "out_of_scope"
     }
   ]
 }
