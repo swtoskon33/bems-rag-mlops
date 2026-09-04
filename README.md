@@ -147,7 +147,7 @@ Choices made deliberately, and what each one trades off:
 ## Results
 
 See docs/eval_report.md (regenerate: `python scripts/run_eval.py`).
-Current golden-set scores (75 queries over 125 facet chunks, 25 buildings, MiniLM embeddings): hit@k 1.00, MRR 0.93, groundedness 1.00. Scores are deliberately not perfect — the golden set includes paraphrased questions that stress semantic retrieval, so the offline lexical embedder misses some. The eval is meant to expose weaknesses, not flatter the system.
+Current golden-set scores (75 queries over 125 facet chunks, 25 buildings, MiniLM embeddings): hit@k 1.00, MRR 0.93, groundedness 1.00. The golden set covers five groups: direct questions, paraphrases the reranker was tuned against, held-out paraphrases, multi-facet questions needing two chunks, and out-of-scope questions the system should decline. That last group is what caught the abstention gap: before the relevance floor, the system answered 25 out of 25 unanswerable questions with grounded=True.
 
 ## Embedding benchmark
 
@@ -173,6 +173,9 @@ optional extra (`pip install -e ".[semantic]"`, `EMBEDDING_BACKEND=minilm`).
 
 
 **All benchmark numbers in this README come from MiniLM embeddings.** The hashing embedder remains the zero-dependency fallback so the test suite runs in CI without a model download, but it is not the configuration the results describe. Regenerate with `KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_*.py`.
+
+
+**Reproducing the numbers.** CI runs the hashing fallback so it needs no model download; the published figures come from MiniLM. A nightly workflow (`.github/workflows/nightly.yml`) reruns the evaluation and benchmarks with the `[semantic]` extra and fails if the committed reports have drifted.
 
 ## Retrieval benchmark
 
@@ -297,7 +300,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
       retrieval/       pluggable embeddings + per-tenant FAISS retriever
       generation/      generator + groundedness guard
       eval/            metrics + harness + MLflow model registry (promotion/rollback)
-    tests/             unit, data, integration (72 tests)
+    tests/             unit, data, integration (76 tests)
     scripts/run_eval.py  offline eval -> MLflow + committed report
     docs/              eval report + CI/CD and drift runbooks
 
@@ -305,7 +308,7 @@ Real runs logged to the MLflow tracking server and registry (regenerate with `py
 
 - [x] Core RAG: ingest, retrieval, generation, groundedness guard
 - [x] Offline eval harness + MLflow tracking + committed report
-- [x] Test tiers: unit / data / integration (72 tests)
+- [x] Test tiers: unit / data / integration (76 tests)
 - [x] Champion/challenger validation gate (no per-building regression)
 - [x] MLflow model registry: versioned promotion (alias flip) + rollback
 - [x] CI (GitHub Actions: lint + all tiers) and CD (shadow -> canary -> rollback)

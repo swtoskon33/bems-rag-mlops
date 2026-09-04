@@ -1,0 +1,68 @@
+name: Nightly benchmarks
+
+# The published numbers come from MiniLM embeddings, but CI runs the hashing fallback so
+# it stays dependency-light. Without this job nothing automated ever reproduces them.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  semantic-benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache the sentence-transformer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-minilm-${{ runner.os }}
+
+      - name: Install with the semantic extra
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,semantic]"
+
+      - name: Download BDG2 metadata
+        run: |
+          mkdir -p data/bdg2
+          curl -sL "https://media.githubusercontent.com/media/buds-lab/building-data-genome-project-2/master/data/metadata/metadata.csv" -o data/bdg2/metadata.csv
+
+      - name: Build the golden set
+        run: python scripts/build_golden.py
+
+      - name: Evaluation
+        env:
+          EMBEDDING_BACKEND: minilm
+          KMP_DUPLICATE_LIB_OK: "TRUE"
+        run: python scripts/run_eval.py
+
+      - name: Retrieval and embedding benchmarks
+        env:
+          EMBEDDING_BACKEND: minilm
+          KMP_DUPLICATE_LIB_OK: "TRUE"
+        run: |
+          python scripts/benchmark_retrieval.py
+          python scripts/benchmark_embeddings.py
+
+      - name: Fail if the committed reports drifted
+        run: |
+          if ! git diff --quiet docs/; then
+            echo "Reports differ from what is committed:"
+            git diff --stat docs/
+            echo "Regenerate them locally and commit the result."
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-reports
+          path: docs/
