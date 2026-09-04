@@ -10,6 +10,7 @@ that column is the honest estimate of what reranking buys.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from bems_rag.ingest.bdg2 import load_bdg2_facet_chunks
@@ -48,6 +49,7 @@ def hit_and_mrr(reranker, chunks, queries, k):
 
 
 def main() -> None:
+    os.environ.setdefault("EMBEDDING_BACKEND", "minilm")
     chunks, all_queries = _load()
     by_group = {g: [q for q in all_queries if q.get("difficulty") == g] for g in GROUPS}
 
@@ -81,24 +83,21 @@ def main() -> None:
     held_gain = summary["paraphrased_heldout"][1] - summary["paraphrased_heldout"][0]
 
     note = (
-        f"On the dev paraphrases the reranker gains {dev_gain:+.2f} hit@1; on the held-out "
-        f"paraphrases it gains {held_gain:+.2f}. The held-out number is negative: the "
-        "reranker actively hurts retrieval on wording its synonym map has not seen. That "
-        "gap is the whole finding. The dev gain measured a hand-written mapping from the "
-        "test queries to the corpus vocabulary, not a reranking capability, and once that "
-        "mapping does not apply the lexical rescoring reorders candidates worse than the "
-        "retriever had them. A synonym table is a lookup, not a model: it cannot "
-        "generalise, and here it does not degrade gracefully either. This is the argument "
-        "for a cross-encoder, which scores a (query, passage) pair on its own merits "
-        "rather than on whether the words happen to match a list."
+        f"With semantic embeddings the reranker contributes nothing: {dev_gain:+.2f} hit@1 "
+        f"on the dev paraphrases and {held_gain:+.2f} on the held-out ones, which is to say "
+        "identical scores either way. That closes the question the earlier hashing-embedder "
+        "run raised. There, the reranker appeared to add +0.36 on dev paraphrases and "
+        "-0.20 on held-out ones: a synonym map written against the dev wording, "
+        "compensating for a retriever that could not match a paraphrase at all. Fix the "
+        "retriever and the compensation has nothing left to do. The reranker ships off by "
+        "default (`RERANKER_BACKEND=none`); a cross-encoder, which scores a (query, "
+        "passage) pair rather than checking words against a list, is the version of this "
+        "stage that would still be worth running."
     )
     caveat = (
-        "Both retrieval stages here are lexical: the offline default is a hashing "
-        "embedder (bag of hashed tokens), not a semantic model, which is why a lexical "
-        "reranker moves the numbers as much as it does. With real embeddings the baseline "
-        "would be higher and the reranker's contribution smaller and more semantic. "
-        "Reranking is off by default (`RERANKER_BACKEND=none`); these numbers come from "
-        "`RERANKER_BACKEND=lexical`."
+        "Numbers are from MiniLM embeddings (`EMBEDDING_BACKEND=minilm`). The hashing "
+        "embedder remains available as a zero-dependency CI fallback, and its numbers are "
+        "in docs/embedding_benchmark.md for comparison."
     )
     lines += ["", note, "", caveat, ""]
     OUT.write_text("\n".join(lines))

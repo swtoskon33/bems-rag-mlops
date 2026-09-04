@@ -176,25 +176,22 @@ optional extra (`pip install -e ".[semantic]"`, `EMBEDDING_BACKEND=minilm`).
 
 ## Retrieval benchmark
 
-Baseline retrieval against two-stage retrieve->rerank, split by query group
-(regenerate: `python scripts/benchmark_retrieval.py`, full table in
-docs/retrieval_benchmark.md):
+Baseline retrieval against two-stage retrieve->rerank, by query group, on MiniLM
+embeddings (regenerate: `KMP_DUPLICATE_LIB_OK=TRUE python scripts/benchmark_retrieval.py`,
+full table in docs/retrieval_benchmark.md):
 
-| Query group | hit@1 baseline | hit@1 reranked | Change |
-|-------------|----------------|----------------|--------|
-| direct | 1.00 | 1.00 | - |
-| paraphrased, dev | 0.44 | 0.80 | +0.36 |
-| paraphrased, held-out | 0.36 | 0.16 | -0.20 |
+| Query group | hit@1 baseline | hit@1 reranked | hit@3 baseline |
+|-------------|----------------|----------------|----------------|
+| direct | 1.00 | 1.00 | 1.00 |
+| paraphrased, dev | 1.00 | 1.00 | 1.00 |
+| paraphrased, held-out | 0.64 | 0.64 | 1.00 |
 
-The split matters more than the numbers. The reranker's synonym map was written
-while looking at the dev paraphrases, so the +0.36 there measures a hand-written
-mapping from those queries to the corpus vocabulary. On held-out paraphrases,
-worded after the map was frozen, the same reranker makes retrieval *worse*: a
-lookup table cannot generalise, and here it does not degrade gracefully either.
-
-That is the argument for a cross-encoder, which scores a (query, passage) pair on
-its own merits rather than on whether the words match a list. It is also why the
-reranker ships off by default (`RERANKER_BACKEND=none`).
+The reranker adds nothing, and that is the finding. On the earlier hashing embedder it
+appeared to add +0.36 on dev paraphrases and -0.20 on held-out ones, because its synonym
+map had been written against the dev wording to compensate for a retriever that could not
+match a paraphrase at all. With a semantic retriever there is nothing left to compensate
+for. It ships off by default; a cross-encoder, scoring a (query, passage) pair rather than
+matching words against a list, is the version of this stage worth running.
 
 ## Retrieval ablation
 
